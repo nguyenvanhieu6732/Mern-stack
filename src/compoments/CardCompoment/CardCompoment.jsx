@@ -16,7 +16,7 @@ const CardCompoment = () => {
       <Card
         hoverable
         style={{ width: 160 }}
-        bodyStyle={{ padding: "10px" }}
+        styles={{ body: { padding: '10px' } }}
         cover={
           <img
             alt="example"

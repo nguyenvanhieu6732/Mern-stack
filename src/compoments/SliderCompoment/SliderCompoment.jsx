@@ -15,9 +15,10 @@ const SliderCompoment = ({ arrImages }) => {
 
   return (
     <Slider {...settings}>
-      {arrImages.map((item) => {
+      {arrImages.map((item, index) => {
         return (
           <Image
+            key={index}
             src={item}
             alt="slider"
             preview={false}

@@ -1,70 +1,45 @@
-# Getting Started with Create React App
-
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
-
-## Available Scripts
-
-In the project directory, you can run:
-
-### `npm start`
 
 Runs the app in the development mode.\
 Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
 
-### `npm test`
+<---------->
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+cấu trúc và giải thích luồng chạy của router, controller, service
+##########################
+1. Router (Tuyến Đường)
+Mô Tả:
 
-### `npm run build`
+Router là nơi bạn định nghĩa các tuyến đường (routes) của ứng dụng, tức là các đường dẫn URL mà ứng dụng của bạn sẽ lắng nghe và xử lý.
+Trong file router, bạn ánh xạ các URL đến các hàm xử lý cụ thể (thường là các hàm trong controller)
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+2. Controller (Điều Khiển)
+Mô Tả:
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+Controller là nơi bạn xử lý logic của ứng dụng liên quan đến yêu cầu (requests) từ người dùng.
+Controllers nhận yêu cầu từ router, xử lý các yêu cầu đó, và thường gọi các hàm trong service để thực hiện các thao tác cụ thể (như truy vấn cơ sở dữ liệu, xử lý nghiệp vụ).
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+3. Service (Dịch Vụ)
+Mô Tả:
 
-### `npm run eject`
+Service là nơi bạn thực hiện các thao tác nghiệp vụ cụ thể và tương tác với cơ sở dữ liệu hoặc các dịch vụ bên ngoài.
+Services thường bao gồm logic phức tạp hơn, như truy vấn cơ sở dữ liệu, mã hóa mật khẩu, hoặc gọi các API bên ngoài.
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+##########################
+Luồng Chạy Cơ Bản
+Nhận Yêu Cầu:
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+Khi một yêu cầu (request) được gửi đến máy chủ, Express sẽ kiểm tra các tuyến đường (routes) đã định nghĩa trong file router.
+Gọi Controller:
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+Router ánh xạ yêu cầu đến một hàm trong controller tương ứng.
+Controller xử lý yêu cầu và gọi các phương thức trong service để thực hiện các thao tác cần thiết.
+Xử Lý Nghiệp Vụ:
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+Service thực hiện các thao tác nghiệp vụ, chẳng hạn như tương tác với cơ sở dữ liệu, mã hóa dữ liệu, và xử lý logic nghiệp vụ.
+Gửi Phản Hồi:
 
-## Learn More
+Sau khi service trả về kết quả, controller sẽ nhận kết quả đó và gửi phản hồi (response) đến client.
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
 
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+<-------->

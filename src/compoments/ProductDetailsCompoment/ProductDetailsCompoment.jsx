@@ -3,6 +3,7 @@ import React from "react";
 import imageProduct from "../../assets/images/product1.jpg";
 import imageProductSmall from "../../assets/images/productSmall.jpg";
 import {
+    ButtonBuyProduct,
     ButtonValueNumber,
   InputValueNumber,
   WrapperAddressProduct,
@@ -91,7 +92,7 @@ const ProductDetailsCompoment = () => {
         <WrapperPriceProduct>200.000</WrapperPriceProduct>
         <WrapperAddressProduct>
           <span>Giao đến </span>
-          <span className="address">Viet thuan, vu thu, thai binh</span> -
+          <span className="address">Việt Thuận, Vũ Thư, Thái Bình</span> -
           <span className="change-address">Đổi địa chỉ</span>
         </WrapperAddressProduct>
         <div style={{ margin: "12px 0" }}>Số lượng:</div>
@@ -108,6 +109,14 @@ const ProductDetailsCompoment = () => {
             <MinusOutlined />
           </ButtonValueNumber>
         </div>
+            <Row>
+                <Col span={12}>
+                <ButtonBuyProduct>Thêm vào giỏ Hàng</ButtonBuyProduct>
+                </Col>
+                <Col span={12}>
+                <ButtonBuyProduct className="btnBuyNow">Mua ngay</ButtonBuyProduct>
+                </Col>
+            </Row>
       </Col>
     </Row>
   );

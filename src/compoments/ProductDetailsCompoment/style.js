@@ -49,6 +49,22 @@ export const InputValueNumber = styled(InputNumber)`
         & .ant-input-number-handler-wrap{
             display: none;
         }
-    
-        
+`;
+
+export const ButtonBuyProduct = styled.button`
+    width: 98%;
+    height: 40px;
+    margin: 12px 2px;
+    color: #ee4d2d;
+    border:1px solid #ee4d2d;
+    border-radius: 4px;
+    font-size: 16px;
+    background-color: transparent;
+        &.btnBuyNow{
+            background-color: #ee4d2d;
+            color: #fff;
+            &:hover{
+                background-color: #f05d40;
+            }
+        }
 `
