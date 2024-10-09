@@ -1,4 +1,4 @@
-import React, { Fragment, useEffect } from 'react'
+import React, { Fragment, useEffect, useState } from 'react'
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import { routes } from "./routes/index";
 import DefaultCompoment from './compoments/DefaultCompoment/DefaultCompoment';
@@ -7,14 +7,17 @@ import { useQuery } from '@tanstack/react-query';
 import { isJsonString } from './utils';
 import { jwtDecode } from 'jwt-decode';
 import * as userService from "./services/userService";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { updateUser } from './redux/slices/userSlice';
+import Loading from './compoments/LoadingCompoment/Loading';
 
 
 
 function App() {
 
   const dispatch = useDispatch();
+  const [isLoading, setIsLoading] = useState(false)
+  const user = useSelector((state) => state.user)
 
   const handleDecoded = () => {
     let storageData = localStorage.getItem("access_token");
@@ -28,23 +31,27 @@ function App() {
 
 
   useEffect(() => {
+    setIsLoading(true)
     const { storageData, decoded } = handleDecoded()
     if (decoded?.id) {
       handleGetDetailsUser(decoded?.id, storageData);
     }
+    setIsLoading(false)
+
   }, []);
 
+
+  
   // true
   userService.axiosJWT.interceptors.request.use(async (config) => {
     const currentTime = new Date();
     const { decoded } = handleDecoded();
-    if (decoded?.exp < currentTime.getTime() / 1000)   
-   {
+    if (decoded?.exp < currentTime.getTime() / 1000) {
       try {
         const data = await userService.refreshToken();
         config.headers['token'] = `Bearer ${data?.access_token}`;
+        localStorage.setItem("access_token", JSON.stringify(data?.access_token));
       } catch (error) {
-        // Xử lý lỗi refresh token (ví dụ: thông báo lỗi cho người dùng, chuyển hướng đăng nhập)
         console.error("Refresh token error:", error);
       }
     }
@@ -61,21 +68,24 @@ function App() {
 
   return (
     <div>
-      <Router>
-        <Routes>
-          {routes.map((route) => {
-            const Page = route.page
-            const Layout = route.isShowHeader ? DefaultCompoment : Fragment
-            return (
-              <Route key={route.path} path={route.path} element={
-                <Layout>
-                  <Page />
-                </Layout>
-              } />
-            )
-          })}
-        </Routes>
-      </Router>
+      <Loading isPending={isLoading}>
+        <Router>
+          <Routes>
+            {routes.map((route) => {
+              const Page = route.page
+              const isCheckAuth = !route.isPrivate || user.isAdmin
+              const Layout = route.isShowHeader ? DefaultCompoment : Fragment
+              return (
+                <Route key={route.path} path={isCheckAuth ? route.path : undefined} element={
+                  <Layout>
+                    <Page />
+                  </Layout>
+                } />
+              )
+            })}
+          </Routes>
+        </Router>
+      </Loading>
     </div>
   )
 }

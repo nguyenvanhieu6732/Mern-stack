@@ -9,14 +9,15 @@ import {
   WrapperReportText,
 } from "./style";
 
-const CardCompoment = () => {
+const CardCompoment = (props) => {
+  const { countInStock, description, image, name, price, rating, type } = props;
   const { Meta } = Card;
   return (
     <div>
       <Card
         hoverable
         style={{ width: 160 }}
-        styles={{ body: { padding: '10px' } }}
+        styles={{ body: { padding: "10px" } }}
         cover={
           <img
             alt="example"
@@ -25,15 +26,15 @@ const CardCompoment = () => {
         }
       >
         <StyleNameProduct>
-          <WrapperFavouriteText>Yêu Thích</WrapperFavouriteText> Nguyễn Văn Hiếu
+          <WrapperFavouriteText>Yêu Thích</WrapperFavouriteText> {name}
         </StyleNameProduct>
         <WrapperReportText>
-          <span>4.9</span>
+          <span>{rating}</span>
           <StarFilled style={{ color: "#ee4d2d" }} />
           <span style={{ marginLeft: "16px" }}>Đã bán 1000</span>
         </WrapperReportText>
         <WrapperPriceText>
-          180.000 <WrapperDiscountText>-40%</WrapperDiscountText>
+          {price} <WrapperDiscountText>-40%</WrapperDiscountText>
         </WrapperPriceText>
       </Card>
     </div>

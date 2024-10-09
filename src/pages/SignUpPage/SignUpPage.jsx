@@ -43,6 +43,8 @@ const SignUpPage = () => {
   const mutation = useMutationHooks((data) => userService.signUpUser(data));
   const { data, isSuccess, isError } = mutation;
 
+  console.log(isSuccess)
+  console.log(isError)
   useEffect(() => {
     if (isSuccess && data?.status !== 'ERR') {
       message.success("Đăng ký thành công", messageApi);

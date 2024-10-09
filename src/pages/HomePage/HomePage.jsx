@@ -7,12 +7,24 @@ import slider2 from "../../assets/images/slider2.jpg";
 import slider3 from "../../assets/images/slider3.jpg";
 import slider4 from "../../assets/images/slider4.jpg";
 import CardCompoment from "../../compoments/CardCompoment/CardCompoment";
-import { WrapperLabelText } from "../../compoments/NavbarCompoment/style";
-import NavbarCompoment from "../../compoments/NavbarCompoment/NavbarCompoment";
 import { Button } from "antd";
 import FooterCompoment from "../../compoments/FooterCompoment/FooterCompoment";
+import { useQuery } from "@tanstack/react-query";
+import * as productService from "../../services/productService";
+
 const HomePage = () => {
   const arr = ["TV", "Tủ Lạnh", "Máy Giặt", "Điều Hòa", "Đầu Đĩa"];
+  const fetchProductAll = async () => {
+    const res = await productService.getAllProduct();
+    return res;
+  };
+  const { isLoading, data: product } = useQuery({
+    queryKey: ["product"], // Đây là queryKey
+    queryFn: fetchProductAll, // Hàm lấy dữ liệu
+    retry: 3,
+    retryDelay: 1000,
+  });
+  console.log("data", product);
   return (
     <>
       <div style={{ padding: "0 120px" }}>
@@ -39,17 +51,21 @@ const HomePage = () => {
             flexWrap: "wrap",
           }}
         >
-          <CardCompoment />
-          <CardCompoment />
-          <CardCompoment />
-          <CardCompoment />
-          <CardCompoment />
-          <CardCompoment />
-          <CardCompoment />
-          <CardCompoment />
-          <CardCompoment />
+          {product?.data?.map((productItem) => {
+            return (
+              <CardCompoment
+                key={productItem._id}
+                countInStock={productItem.countInStock}
+                description={productItem.description}
+                image={productItem.image}
+                name={productItem.name}
+                price={productItem.price}
+                rating={productItem.rating}
+                type={productItem.type}
+              />
+            );
+          })}
         </div>
-        {/* <NavbarCompoment /> */}
       </div>
       <div style={{ width: "100%", display: "flex", justifyContent: "center" }}>
         <Button
@@ -63,7 +79,7 @@ const HomePage = () => {
           Xem thêm
         </Button>
       </div>
-      <FooterCompoment/>
+      <FooterCompoment />
     </>
   );
 };

@@ -12,14 +12,20 @@ export const WrapperTextHeader = styled.span`
     color: #fff;
     line-height: 40px;
     white-space: nowrap;
+    cursor: pointer
 `
 export const WrapperHeaderAccount = styled.div`
     display : flex;
     align-items: center;
     color: #fff;
-    justify-content: space-around;
     gap: 10px;
     margin-left: 12px;
     white-space: nowrap;
 `
-
+export const WrapperHeaderPopup = styled.p`
+    cursor : pointer;
+    padding: 4px 8px;
+    &:hover{
+        color: #ee4d2d;
+    }
+`

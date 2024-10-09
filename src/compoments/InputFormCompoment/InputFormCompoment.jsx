@@ -2,7 +2,6 @@ import { Input } from 'antd'
 import React, { useState } from 'react'
 
 const InputFormCompoment = (props) => {
-  const [valueInput, setValueInput] = useState('')
   const {placeholder = 'Nhap text', ...rest} = props
   
   return (
