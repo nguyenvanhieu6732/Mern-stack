@@ -2,8 +2,6 @@ import React, { Fragment, useEffect, useState } from 'react'
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import { routes } from "./routes/index";
 import DefaultCompoment from './compoments/DefaultCompoment/DefaultCompoment';
-import axios from 'axios';
-import { useQuery } from '@tanstack/react-query';
 import { isJsonString } from './utils';
 import { jwtDecode } from 'jwt-decode';
 import * as userService from "./services/userService";
@@ -16,7 +14,7 @@ import Loading from './compoments/LoadingCompoment/Loading';
 function App() {
 
   const dispatch = useDispatch();
-  const [isLoading, setIsLoading] = useState(false)
+  const [isPending, setIsPending] = useState(false)
   const user = useSelector((state) => state.user)
 
   const handleDecoded = () => {
@@ -31,12 +29,12 @@ function App() {
 
 
   useEffect(() => {
-    setIsLoading(true)
+    setIsPending(true)
     const { storageData, decoded } = handleDecoded()
     if (decoded?.id) {
       handleGetDetailsUser(decoded?.id, storageData);
     }
-    setIsLoading(false)
+    setIsPending(false)
 
   }, []);
 
@@ -68,7 +66,7 @@ function App() {
 
   return (
     <div>
-      <Loading isPending={isLoading}>
+      <Loading isPending={isPending}>
         <Router>
           <Routes>
             {routes.map((route) => {

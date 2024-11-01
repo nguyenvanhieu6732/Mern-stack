@@ -18,7 +18,7 @@ const HomePage = () => {
     const res = await productService.getAllProduct();
     return res;
   };
-  const { isLoading, data: product } = useQuery({
+  const { isPending, data: product } = useQuery({
     queryKey: ["product"], // Đây là queryKey
     queryFn: fetchProductAll, // Hàm lấy dữ liệu
     retry: 3,
@@ -47,7 +47,7 @@ const HomePage = () => {
           style={{
             marginTop: "32px",
             display: "flex",
-            gap: "20px",
+            gap: "29px",
             flexWrap: "wrap",
           }}
         >
