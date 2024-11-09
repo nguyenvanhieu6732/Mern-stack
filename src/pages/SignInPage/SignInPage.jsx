@@ -9,7 +9,7 @@ import { EyeInvisibleOutlined, EyeOutlined } from "@ant-design/icons";
 import { Button, Image, Input } from "antd";
 import imageLogo from "../../assets/images/SignIn.jpg";
 import FooterCompoment from "../../compoments/FooterCompoment/FooterCompoment";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import * as userService from "../../services/userService";
 import { useMutationHooks } from "../../hook/useMutationHook";
 import Loading from "../../compoments/LoadingCompoment/Loading";
@@ -20,6 +20,8 @@ import { updateUser } from "../../redux/slices/userSlice";
 
 const SignInPage = () => {
   const [email, setEmail] = useState("");
+  const location = useLocation();
+  const navigate = useNavigate();
   const [password, setPassword] = useState("");
   const { messageApi, contextHolder } = message.useCustomMessage();
   const dispatch = useDispatch();
@@ -50,11 +52,17 @@ const SignInPage = () => {
   // hook useEffect
   useEffect(() => {
     if (isSuccess && data?.status !== "ERR") {
-      // check status
+      if (location?.state) {
+        setTimeout(() => {
+          Navigate(location?.state);
+        }, 1500);
+      } else {
+        setTimeout(() => {
+          Navigate("/"); // navigate homePage
+        }, 1500);
+      }
       message.success("Đăng nhập thành công", messageApi);
-      setTimeout(() => {
-        Navigate("/"); // navigate homePage
-      }, 1500);
+
       localStorage.setItem("access_token", JSON.stringify(data?.access_token)); // save access_token in local storage
       if (data?.access_token) {
         const decoded = jwtDecode(data?.access_token);
@@ -62,11 +70,11 @@ const SignInPage = () => {
           handleGetDetailsUser(decoded?.id, data?.access_token);
         }
       }
-    } else if (isError) { 
+    } else if (isError) {
       // check status Error
       message.error("Có lỗi xảy ra", messageApi);
     }
-  }, [isSuccess, isError, data]);  // compare change in value
+  }, [isSuccess, isError, data]); // compare change in value
 
   // update status login
   const handleGetDetailsUser = async (id, token) => {

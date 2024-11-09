@@ -1,4 +1,4 @@
-import { createSlice, isAction, isPending } from '@reduxjs/toolkit'
+import { createSlice } from '@reduxjs/toolkit'
 
 const initialState = {
     name: '',

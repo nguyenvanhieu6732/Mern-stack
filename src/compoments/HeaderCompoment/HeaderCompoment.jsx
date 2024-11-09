@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Col, Row, Input, Space, Popover, Button } from "antd";
+import { Badge, Col, Input, Popover } from "antd";
 import {
   WrapperHeader,
   WrapperTextHeader,
@@ -17,12 +17,16 @@ import { useDispatch, useSelector } from "react-redux";
 import * as userService from "../../services/userService";
 import { resetUser } from "../../redux/slices/userSlice";
 import Loading from "../../compoments/LoadingCompoment/Loading";
+import { searchProduct } from "../../redux/slices/productSlice";
+import { resetOrder } from "../../redux/slices/orderSlice";
+
 
 const { Search } = Input;
 
 const HeaderCompomment = ({ isHiddenSearch = false, isHiddenCart = false }) => {
   const Navigate = useNavigate();
   const user = useSelector((state) => state.user);
+  const order = useSelector((state) => state.order)
   const handleNavigateLogin = () => {
     Navigate("/sign-in");
   };
@@ -30,10 +34,12 @@ const HeaderCompomment = ({ isHiddenSearch = false, isHiddenCart = false }) => {
   const [pending, setPending] = useState(false);
   const [useName, setUserName] = useState("");
   const [useAvatar, setUserAvatar] = useState("");
+  const [search, setSearch] = useState("");
   const handleLogout = async () => {
     setPending(true);
     await userService.logOutUser();
     dispatch(resetUser());
+    dispatch(resetOrder())
     localStorage.removeItem("access_token");
     Navigate("/");
     setPending(false);
@@ -62,6 +68,11 @@ const HeaderCompomment = ({ isHiddenSearch = false, isHiddenCart = false }) => {
   const handleLogo = () => {
     Navigate("/");
   };
+
+  const onSearch = (e) => {
+    setSearch(e.target.value);
+    dispatch(searchProduct(e.target.value));
+  };
   return (
     <div>
       <WrapperHeader
@@ -79,6 +90,7 @@ const HeaderCompomment = ({ isHiddenSearch = false, isHiddenCart = false }) => {
               placeholder="Tên mặt hàng mà bạn muốn tìm kiếm"
               enterButton="Tìm Kiếm"
               size="large"
+              onChange={onSearch}
             />
           </Col>
         )}
@@ -125,8 +137,10 @@ const HeaderCompomment = ({ isHiddenSearch = false, isHiddenCart = false }) => {
                 </div>
               )}
               {!isHiddenCart && (
-                <div style={{ marginLeft: "46px" }}>
-                  <ShoppingCartOutlined style={{ fontSize: "32px" }} />
+                <div style={{ marginLeft: "46px", cursor:"pointer" }} onClick={() => Navigate("/order")}>
+                  <Badge count={order?.orderItems?.length} small>
+                    <ShoppingCartOutlined style={{ fontSize: "32px", color: "white" }} />
+                  </Badge>
                   <span>Giỏ hàng</span>
                 </div>
               )}

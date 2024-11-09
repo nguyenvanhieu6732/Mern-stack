@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useRef, useState } from "react";
 import TypeProduct from "../../compoments/TypeProduct/TypeProduct";
 import { WrapperTypeProduct } from "./style";
 import SliderCompoment from "../../compoments/SliderCompoment/SliderCompoment";
@@ -11,20 +11,38 @@ import { Button } from "antd";
 import FooterCompoment from "../../compoments/FooterCompoment/FooterCompoment";
 import { useQuery } from "@tanstack/react-query";
 import * as productService from "../../services/productService";
+import { useSelector } from "react-redux";
+import Loading from "../../compoments/LoadingCompoment/Loading";
+import { useDebounce } from "../../hook/useDebounce";
 
 const HomePage = () => {
+  const searchProduct = useSelector((state) => state?.product?.search);
+  const refSearch = useRef();
+  const [pending, setPending] = useState(false);
+  const searchDebounce = useDebounce(searchProduct, 1000);
+  const [stateProduct, setStateProduct] = useState([]);
+  const [limit, setLimit] = useState(6);
   const arr = ["TV", "Tủ Lạnh", "Máy Giặt", "Điều Hòa", "Đầu Đĩa"];
-  const fetchProductAll = async () => {
-    const res = await productService.getAllProduct();
+
+  const fetchProductAll = async (context) => {
+    const limit = context?.queryKey && context?.queryKey[1];
+    const search = context?.queryKey && context?.queryKey[2];
+    const res = await productService.getAllProduct(search, limit);
     return res;
   };
-  const { isPending, data: product } = useQuery({
-    queryKey: ["product"], // Đây là queryKey
-    queryFn: fetchProductAll, // Hàm lấy dữ liệu
+
+  const {
+    isPending,
+    data: product,
+    isPreviousData,
+  } = useQuery({
+    queryKey: ["product", limit, searchDebounce],
+    queryFn: fetchProductAll,
     retry: 3,
     retryDelay: 1000,
+    keepPreviousData: true,
   });
-  console.log("data", product);
+
   return (
     <>
       <div style={{ padding: "0 120px" }}>
@@ -43,43 +61,53 @@ const HomePage = () => {
         }}
       >
         <SliderCompoment arrImages={[slider1, slider2, slider3, slider4]} />
-        <div
-          style={{
-            marginTop: "32px",
-            display: "flex",
-            gap: "29px",
-            flexWrap: "wrap",
-          }}
-        >
-          {product?.data?.map((productItem) => {
-            return (
-              <CardCompoment
-                key={productItem._id}
-                countInStock={productItem.countInStock}
-                description={productItem.description}
-                image={productItem.image}
-                name={productItem.name}
-                price={productItem.price}
-                rating={productItem.rating}
-                type={productItem.type}
-              />
-            );
-          })}
-        </div>
+        <Loading isPending={isPending || pending}>
+          <div
+            style={{
+              marginTop: "32px",
+              display: "flex",
+              gap: "28px",
+              flexWrap: "wrap",
+            }}
+          >
+            {product?.data?.map((productItem) => {
+              return (
+                <CardCompoment
+                  key={productItem._id}
+                  countInStock={productItem.countInStock}
+                  description={productItem.description}
+                  image={productItem.image}
+                  name={productItem.name}
+                  price={productItem.price}
+                  rating={productItem.rating}
+                  type={productItem.type}
+                  id={productItem._id}
+                />
+              );
+            })}
+          </div>
+          <div
+            style={{ display: "grid", placeItems: "center", margin: "32px" }}
+          >
+            <Button
+              type="primary"
+              style={{
+                margin: "32px",
+                padding: "10px 20px",
+                fontSize: "16px",
+              }}
+              onClick={() => setLimit((prev) => prev + 6)}
+              disabled={
+                product?.total === product?.data?.length ||
+                product?.totalPage === 1
+              }
+            >
+              Xem thêm
+            </Button>
+          </div>
+        </Loading>
       </div>
-      <div style={{ width: "100%", display: "flex", justifyContent: "center" }}>
-        <Button
-          type="primary"
-          style={{
-            margin: "32px",
-            padding: "10px 20px",
-            fontSize: "16px",
-          }}
-        >
-          Xem thêm
-        </Button>
-      </div>
-      <FooterCompoment />
+      {/* <FooterCompoment /> */}
     </>
   );
 };

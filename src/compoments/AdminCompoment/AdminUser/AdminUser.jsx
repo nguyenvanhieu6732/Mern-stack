@@ -4,7 +4,6 @@ import { Button, Form, Space } from "antd";
 import { getBase64 } from "../../../utils";
 import { useQuery } from "@tanstack/react-query";
 import {
-  PlusOutlined,
   EditOutlined,
   SearchOutlined,
   DeleteOutlined,
@@ -30,49 +29,37 @@ const AdminUser = () => {
   const searchInput = useRef(null);
   const user = useSelector((state) => state?.user);
 
-  const initial = () => ({
+  const [stateUserDetails, setStateUserDetails] = useState({
     name: "",
     email: "",
     phone: "",
     isAdmin: false,
-    // avatar: "",
-    // address: "",
+    avatar: "",
+    address: "",
   });
-  const [stateUser, setStateUser] = useState(initial());
-  const [stateUserDetails, setStateUserDetails] = useState(initial());
 
   const [form] = Form.useForm();
-  const mutation = useMutationHooks((data) => {
-    const { name, email, phone, isAdmin } = data;
-    const res = userService.signUpUser({
-      name: "",
-      email: "",
-      phone: "",
-      isAdmin: false,
-      // avatar: "",
-      // address: "",
-    });
-    return res;
-  });
 
+  //true
   const mutationUpdate = useMutationHooks((data) => {
     const { id, token, ...rests } = data;
-    const res = userService.updateUser(id, token, { ...rests });
+    const res = userService.updateUser(id, { ...rests }, token);
     return res;
   });
-
+  // true
   const mutationDeleted = useMutationHooks((data) => {
-    const { id, token } = data;
-    const res = userService.deleteUser(id, token);
+    const { id, token, ...rests } = data;
+    const res = userService.deleteUser(id, { ...rests }, token);
     return res;
   });
-
+  
+  // true
   const getAllUser = async () => {
     const res = await userService.getAllUser(user?.access_token);
     return res;
   };
-
-  const fetchDetailUser = async (rowSelected) => {
+  // true
+  const fetchGetDetailsUser = async (rowSelected) => {
     const res = await userService.getDetailsUser(rowSelected);
 
     if (res?.data) {
@@ -81,35 +68,32 @@ const AdminUser = () => {
         email: res?.data?.email,
         phone: res?.data?.phone,
         isAdmin: res?.data?.isAdmin,
-        // address: res?.data?.address,
-        // avatar: res.data?.avatar,
+        address: res?.data?.address,
+        avatar: res.data?.avatar,
       });
     }
     setIsPendingUpdate(false);
   };
 
+  //true
+
+  useEffect(() => {
+    form.setFieldValue(stateUserDetails);
+  }, [form, stateUserDetails]);
+
+  // true
+
   useEffect(() => {
     if (rowSelected && isOpenDrawer) {
       setIsPendingUpdate(true);
-      fetchDetailUser(rowSelected);
+      fetchGetDetailsUser(rowSelected);
     }
   }, [rowSelected, isOpenDrawer]);
 
-  useEffect(() => {
-    if (!isModalOpen) {
-      form.setFieldsValue(stateUserDetails);
-    } else {
-      form.setFieldsValue(initial());
-    }
-  }, [form, stateUserDetails, isModalOpen]);
-
   const handleDetailUser = () => {
-    if (rowSelected) {
-      setIsPendingUpdate(true);
-      fetchDetailUser(rowSelected);
-    }
     setIsOpenDrawer(true);
   };
+
   const renderAction = () => {
     return (
       <div style={{ display: "flex", gap: "16px" }}>
@@ -125,7 +109,6 @@ const AdminUser = () => {
     );
   };
 
-  const { data, isPending, isSuccess, isError } = mutation;
   const {
     data: dataUpdated,
     isPending: isPendingUpdated,
@@ -140,16 +123,11 @@ const AdminUser = () => {
     isError: isErrorDeleted,
   } = mutationDeleted;
 
-  const queryUser = useQuery({
-    queryKey: ["user"],
-    queryFn: getAllUser,
-  });
-  const { isPending: isPendingUser, data: User } = queryUser;
+  const queryUser = useQuery({ queryKey: ["users"], queryFn: getAllUser });
+  const { isPending: isPendingUser, data: users } = queryUser;
 
   const handleSearch = (selectedKeys, confirm, dataIndex) => {
     confirm();
-    // setSearchText(selectedKeys[0]);
-    // setSearchedColumn(dataIndex);
   };
   const handleReset = (clearFilters) => {
     clearFilters();
@@ -275,33 +253,29 @@ const AdminUser = () => {
       sorter: (a, b) => a.phone - b.phone,
       ...getColumnSearchProps("phone"),
     },
-    {
-      title: "Action",
-      dataIndex: "action",
-      render: renderAction,
-    },
+    // {
+    //   title: "Action",
+    //   dataIndex: "action",
+    //   render: renderAction,
+    // },
   ];
   const dataTable =
-    User?.data?.length &&
-    User?.data?.map((UserItem) => {
+    users?.data?.length &&
+    users?.data?.map((user) => {
       return {
-        ...UserItem,
-        key: UserItem._id,
-        isAdmin: UserItem.isAdmin ? "TRUE" : "FALSE",
+        ...user,
+        key: user._id,
+        isAdmin: user.isAdmin ? "True" : "False",
+        name: user.name ? user.name : "Null",
+        email: user.email ? user.email : "Null",
+        phone: user.phone ? user.phone : "Null",
+        address: user.address ? user.address : "Null",
       };
     });
-  useEffect(() => {
-    if (isSuccess && data?.status === "OK") {
-      message.success("Thêm sản phẩm thành công", messageApi);
-      handleCancel();
-    } else if (isError) {
-      message.error("Có lỗi xảy ra", messageApi);
-    }
-  }, [isSuccess]);
 
   useEffect(() => {
     if (isSuccessDeleted && dataDeleted?.status === "OK") {
-      message.success("Xóa sản phẩm thành công", messageApi);
+      message.success("Xóa user thành công", messageApi);
       handleCancelDelete();
     } else if (isErrorDeleted) {
       message.error("Có lỗi xảy ra", messageApi);
@@ -323,19 +297,6 @@ const AdminUser = () => {
     );
   };
 
-  const handleCancel = () => {
-    setIsModalOpen(false);
-    setStateUser({
-      name: "",
-      email: "",
-      phone: "",
-      isAdmin: false,
-      // avatar: "",
-      // address: "",
-    });
-    form.resetFields();
-  };
-
   const handleCloseDrawer = () => {
     setIsOpenDrawer(false);
     setStateUserDetails({
@@ -346,24 +307,9 @@ const AdminUser = () => {
     });
     form.resetFields();
   };
-  //check
-  const onFinish = (values) => {
-    mutation.mutate(stateUser, {
-      onSettled: () => {
-        queryUser.refetch();
-      },
-    });
-  };
 
   const onFinishFailed = (errorInfo) => {
     console.log("Failed:", errorInfo);
-  };
-
-  const handleOnChange = (e) => {
-    setStateUser({
-      ...stateUser,
-      [e.target.name]: e.target.value,
-    });
   };
 
   const handleOnChangeDetails = (e) => {
@@ -374,34 +320,10 @@ const AdminUser = () => {
   };
 
   // check
-  const handleAvatar = async ({ fileList }) => {
-    const file = fileList[0];
-    if (!file.url && !file.preview) {
-      file.preview = await getBase64(file.originFileObj);
-    }
-    setStateUser({
-      ...stateUser,
-      image: file.preview,
-    });
-  };
 
-  const handleAvatarDetails = async ({ fileList }) => {
-    const file = fileList[0];
-    if (!file.url && !file.preview) {
-      file.preview = await getBase64(file.originFileObj);
-    }
-    setStateUser({
-      ...stateUserDetails,
-      image: file.preview,
-    });
-  };
   const onUpdateUser = () => {
     mutationUpdate.mutate(
-      {
-        id: rowSelected,
-        token: user?.access_token,
-        ...stateUserDetails,
-      },
+      { id: rowSelected, token: user?.access_token, ...stateUserDetails },
       {
         onSettled: () => {
           queryUser.refetch();
@@ -410,34 +332,36 @@ const AdminUser = () => {
     );
   };
 
+  const handleOnchangeAvatarDetails = async ({ fileList }) => {
+    const file = fileList[0];
+    if (!file.url && !file.preview) {
+      file.preview = await getBase64(file.originFileObj);
+    }
+    setStateUserDetails({
+      ...stateUserDetails,
+      avatar: file.preview,
+    });
+  };
+
   useEffect(() => {
     if (isSuccessUpdated && dataUpdated?.status === "OK") {
-      message.success("Cập nhật sản phẩm thành công", messageApi);
+      message.success("Cập nhật user thành công", messageApi);
       handleCloseDrawer();
     } else if (isErrorUpdated) {
       message.error("Có lỗi xảy ra", messageApi);
     }
   }, [isSuccessUpdated]);
 
+  useEffect(() => {
+    if (user?.access_token) {
+      queryUser.refetch(); // Lấy lại dữ liệu người dùng khi access_token có giá trị
+    }
+  }, [user?.access_token]);
   return (
     <>
       {contextHolder}
       <div>
         <WrapperHeader>Quản lý người dùng</WrapperHeader>
-        <div style={{ padding: "16px " }}>
-          <Button
-            style={{
-              height: "150px",
-              width: "150px",
-              borderRadius: "6px",
-              borderStyle: "dashed",
-              borderWidth: "2px",
-            }}
-            onClick={() => setIsModalOpen(true)}
-          >
-            <PlusOutlined style={{ fontSize: "64px" }} />
-          </Button>
-        </div>
         <TableCompoment
           columns={columns}
           isPending={isPendingUser}
@@ -450,136 +374,9 @@ const AdminUser = () => {
             };
           }}
         />
-        <ModalCompoment
-          forceRender
-          title="Thêm người dùng"
-          open={isModalOpen}
-          onCancel={handleCancel}
-          footer={null}
-        >
-          <Loading isPending={isPending}>
-            <Form
-              name="basic"
-              labelCol={{
-                span: 6,
-              }}
-              wrapperCol={{
-                span: 18,
-              }}
-              style={{
-                maxWidth: 600,
-              }}
-              onFinish={onFinish}
-              onFinishFailed={onFinishFailed}
-              autoComplete="off"
-              form={form}
-            >
-              <Form.Item
-                label="Name"
-                name="name"
-                rules={[
-                  {
-                    required: true,
-                    message: "Please input your name!",
-                  },
-                ]}
-              >
-                <InputComponentProduct
-                  value={stateUser.name}
-                  onChange={handleOnChange}
-                  name="name"
-                />
-              </Form.Item>
 
-              <Form.Item
-                label="Email"
-                name="email"
-                rules={[
-                  {
-                    required: true,
-                    message: "Please input your email!",
-                  },
-                ]}
-              >
-                <InputComponentProduct
-                  value={stateUser.type}
-                  onChange={handleOnChange}
-                  name="email"
-                />
-              </Form.Item>
-
-              <Form.Item
-                label="Phone"
-                name="phone"
-                rules={[
-                  {
-                    required: true,
-                    message: "Please input your phone!",
-                  },
-                ]}
-              >
-                <InputComponentProduct
-                  value={stateUser.phone}
-                  onChange={handleOnChange}
-                  name="phone"
-                />
-              </Form.Item>
-
-              <Form.Item
-                label="Address"
-                name="address"
-                rules={[
-                  {
-                    required: true,
-                    message: "Please input your address!",
-                  },
-                ]}
-              >
-                <InputComponentProduct
-                  value={stateUser.adress}
-                  onChange={handleOnChange}
-                  name="address"
-                />
-              </Form.Item>
-
-              {/* check */}
-              <Form.Item
-                label="Image"
-                name="image"
-                rules={[
-                  {
-                    required: true,
-                    message: "Please select your image!",
-                  },
-                ]}
-              >
-                <div>
-                  <WrapperUploadFile onChange={handleAvatar} maxCount={1}>
-                    <Button>Select File</Button>
-                  </WrapperUploadFile>
-                  {stateUser?.image && (
-                    <img
-                      src={stateUser.image}
-                      style={{
-                        height: "120px",
-                        width: "120px",
-                        objectFit: "cover",
-                      }}
-                      alt="avatar"
-                    />
-                  )}
-                </div>
-              </Form.Item>
-              <Form.Item wrapperCol={{ offset: 18, span: 16 }}>
-                <Button type="primary" htmlType="submit">
-                  Add User
-                </Button>
-              </Form.Item>
-            </Form>
-          </Loading>
-        </ModalCompoment>
         <DrawerComponent
-          title="Chi tiết sản phẩm"
+          title="Chi tiết người dùng"
           isOpen={isOpenDrawer}
           width="45%"
           onClose={() => {
@@ -598,7 +395,7 @@ const AdminUser = () => {
               style={{
                 maxWidth: 600,
               }}
-              onFinish={onFinish}
+              onFinish={onUpdateUser}
               onFinishFailed={onFinishFailed}
               autoComplete="off"
               form={form}
@@ -614,8 +411,8 @@ const AdminUser = () => {
                 ]}
               >
                 <InputComponentProduct
-                  value={stateUser.name}
-                  onChange={handleOnChange}
+                  value={stateUserDetails.name}
+                  onChange={handleOnChangeDetails}
                   name="name"
                 />
               </Form.Item>
@@ -631,8 +428,8 @@ const AdminUser = () => {
                 ]}
               >
                 <InputComponentProduct
-                  value={stateUser.type}
-                  onChange={handleOnChange}
+                  value={stateUserDetails.type}
+                  onChange={handleOnChangeDetails}
                   name="email"
                 />
               </Form.Item>
@@ -648,8 +445,8 @@ const AdminUser = () => {
                 ]}
               >
                 <InputComponentProduct
-                  value={stateUser.phone}
-                  onChange={handleOnChange}
+                  value={stateUserDetails.phone}
+                  onChange={handleOnChangeDetails}
                   name="phone"
                 />
               </Form.Item>
@@ -665,30 +462,33 @@ const AdminUser = () => {
                 ]}
               >
                 <InputComponentProduct
-                  value={stateUser.adress}
-                  onChange={handleOnChange}
+                  value={stateUserDetails.address}
+                  onChange={handleOnChangeDetails}
                   name="address"
                 />
               </Form.Item>
 
               {/* check */}
               <Form.Item
-                label="Image"
-                name="image"
+                label="Avatar"
+                name="avatar"
                 rules={[
                   {
                     required: true,
-                    message: "Please select your image!",
+                    message: "Please select your avatar!",
                   },
                 ]}
               >
                 <div>
-                  <WrapperUploadFile onChange={handleAvatar} maxCount={1}>
+                  <WrapperUploadFile
+                    onChange={handleOnchangeAvatarDetails}
+                    maxCount={1}
+                  >
                     <Button>Select File</Button>
                   </WrapperUploadFile>
-                  {stateUser?.image && (
+                  {stateUserDetails?.avatar && (
                     <img
-                      src={stateUser.image}
+                      src={stateUserDetails.avatar}
                       style={{
                         height: "120px",
                         width: "120px",
@@ -701,7 +501,7 @@ const AdminUser = () => {
               </Form.Item>
               <Form.Item wrapperCol={{ offset: 18, span: 16 }}>
                 <Button type="primary" htmlType="submit">
-                  Add User
+                  Apply
                 </Button>
               </Form.Item>
             </Form>

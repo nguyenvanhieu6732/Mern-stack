@@ -409,7 +409,7 @@ const AdminProduct = () => {
     if (!file.url && !file.preview) {
       file.preview = await getBase64(file.originFileObj);
     }
-    setStateProduct({
+    setStateProductDetails({
       ...stateProductDetails,
       image: file.preview,
     });

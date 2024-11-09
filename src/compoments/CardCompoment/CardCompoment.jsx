@@ -8,12 +8,18 @@ import {
   WrapperPriceText,
   WrapperReportText,
 } from "./style";
+import { convertPrice } from "../../utils";
+import { useNavigate } from "react-router-dom";
 
 const CardCompoment = (props) => {
-  const { countInStock, description, image, name, price, rating, type } = props;
+  const { countInStock, description, image, name, price, rating, type, id } = props;
+  const navigate = useNavigate()
+  const handleDetailsProduct = (id) => {
+    navigate(`/product-details/${id}`)
+  };
   const { Meta } = Card;
   return (
-    <div>
+    <div style={{ padding: "16px 0" }}>
       <Card
         hoverable
         style={{ width: 160 }}
@@ -21,12 +27,19 @@ const CardCompoment = (props) => {
         cover={
           <img
             alt="example"
-            src="https://os.alipayobjects.com/rmsportal/QBnOOoLaAfKPirc.png"
+            src={image}
+            style={{
+              width: "100%",
+              height: "200px",
+              objectFit: "cover",
+            }}
           />
         }
+        onClick={() => handleDetailsProduct(id)}
       >
         <StyleNameProduct>
-          <WrapperFavouriteText>Yêu Thích</WrapperFavouriteText> {name}
+          <WrapperFavouriteText>Yêu Thích</WrapperFavouriteText> <br />
+          {name}
         </StyleNameProduct>
         <WrapperReportText>
           <span>{rating}</span>
@@ -34,7 +47,7 @@ const CardCompoment = (props) => {
           <span style={{ marginLeft: "16px" }}>Đã bán 1000</span>
         </WrapperReportText>
         <WrapperPriceText>
-          {price} <WrapperDiscountText>-40%</WrapperDiscountText>
+          {convertPrice(price)} <WrapperDiscountText>-40%</WrapperDiscountText>
         </WrapperPriceText>
       </Card>
     </div>

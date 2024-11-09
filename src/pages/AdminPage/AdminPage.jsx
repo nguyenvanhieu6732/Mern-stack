@@ -8,27 +8,27 @@ import AdminProduct from "../../compoments/AdminCompoment/AdminProduct/AdminProd
 const AdminPage = () => {
   const items = [
     {
-      key: "user",
-      icon: <UserOutlined />,
-      label: "Người dùng",
-    },
-    {
       key: "product",
       icon: <ProductOutlined />,
       label: "Sản phẩm",
     },
+    {
+      key: "user",
+      icon: <UserOutlined />,
+      label: "Người dùng",
+    },
   ];
 
-  const [keySelected, setKeySelected] = useState("user");
+  const [keySelected, setKeySelected] = useState("product");
   const handleOnClickMenu = ({ key }) => {
     setKeySelected(key);
   };
   const renderPage = (key) => {
     switch (key) {
-      case "user":
-        return <AdminUser />;
       case "product":
         return <AdminProduct />;
+      case "user":
+        return <AdminUser />;
       default:
         return <></>;
     }
