@@ -13,21 +13,20 @@ import TableCompoment from "../../TableCompoment/TableCompoment";
 import ModalCompoment from "../../ModalCompoment/ModalCompoment";
 import Loading from "../../LoadingCompoment/Loading";
 import { WrapperUploadFile } from "./style";
-import InputComponentProduct from "../../InputCompoment/InputComponentProduct";
+import InputComponentProduct from "../../InputCompoment/InputComponentProduct.jsx";
 import DrawerComponent from "../../DrawerComponent/DrawerComponent";
 import * as message from "../../Message/Message";
 import { useSelector } from "react-redux";
 import { useMutationHooks } from "../../../hook/useMutationHook";
 
 const AdminUser = () => {
-  const { messageApi, contextHolder } = message.useCustomMessage();
-  const [isModalOpen, setIsModalOpen] = useState(false);
   const [rowSelected, setRowSelected] = useState("");
+  const { messageApi, contextHolder } = message.useCustomMessage();
   const [isOpenDrawer, setIsOpenDrawer] = useState(false);
   const [isPendingUpdate, setIsPendingUpdate] = useState(false);
   const [isModalOpenDelete, setIsModalOpenDelete] = useState(false);
-  const searchInput = useRef(null);
   const user = useSelector((state) => state?.user);
+  const searchInput = useRef(null);
 
   const [stateUserDetails, setStateUserDetails] = useState({
     name: "",
@@ -40,28 +39,42 @@ const AdminUser = () => {
 
   const [form] = Form.useForm();
 
-  //true
   const mutationUpdate = useMutationHooks((data) => {
     const { id, token, ...rests } = data;
     const res = userService.updateUser(id, { ...rests }, token);
     return res;
   });
-  // true
+
+  // const mutationDeletedMany = useMutationHooks((data) => {
+  //   const { token, ...ids } = data;
+  //   const res = userService.deleteManyUser(ids, token);
+  //   return res;
+  // });
+
+  // const handleDelteManyUsers = (ids) => {
+  //   mutationDeletedMany.mutate(
+  //     { ids: ids, token: user?.access_token },
+  //     {
+  //       onSettled: () => {
+  //         queryUser.refetch();
+  //       },
+  //     }
+  //   );
+  // };
+
   const mutationDeleted = useMutationHooks((data) => {
-    const { id, token, ...rests } = data;
-    const res = userService.deleteUser(id, { ...rests }, token);
+    const { id, token } = data;
+    const res = userService.deleteUser(id, token);
     return res;
   });
-  
-  // true
-  const getAllUser = async () => {
+
+  const getAllUsers = async () => {
     const res = await userService.getAllUser(user?.access_token);
     return res;
   };
-  // true
+
   const fetchGetDetailsUser = async (rowSelected) => {
     const res = await userService.getDetailsUser(rowSelected);
-
     if (res?.data) {
       setStateUserDetails({
         name: res?.data?.name,
@@ -75,13 +88,9 @@ const AdminUser = () => {
     setIsPendingUpdate(false);
   };
 
-  //true
-
   useEffect(() => {
-    form.setFieldValue(stateUserDetails);
+    form.setFieldsValue(stateUserDetails);
   }, [form, stateUserDetails]);
-
-  // true
 
   useEffect(() => {
     if (rowSelected && isOpenDrawer) {
@@ -90,23 +99,8 @@ const AdminUser = () => {
     }
   }, [rowSelected, isOpenDrawer]);
 
-  const handleDetailUser = () => {
+  const handleDetailsProduct = () => {
     setIsOpenDrawer(true);
-  };
-
-  const renderAction = () => {
-    return (
-      <div style={{ display: "flex", gap: "16px" }}>
-        <EditOutlined
-          onClick={handleDetailUser}
-          style={{ fontSize: "20px", color: "orange", cursor: "pointer" }}
-        />
-        <DeleteOutlined
-          onClick={() => setIsModalOpenDelete(true)}
-          style={{ fontSize: "20px", color: "red", cursor: "pointer" }}
-        />
-      </div>
-    );
   };
 
   const {
@@ -115,19 +109,40 @@ const AdminUser = () => {
     isSuccess: isSuccessUpdated,
     isError: isErrorUpdated,
   } = mutationUpdate;
-
   const {
     data: dataDeleted,
     isPending: isPendingDeleted,
-    isSuccess: isSuccessDeleted,
+    isSuccess: isSuccessDelected,
     isError: isErrorDeleted,
   } = mutationDeleted;
+  // const {
+  //   data: dataDeletedMany,
+  //   isLoading: isLoadingDeletedMany,
+  //   isSuccess: isSuccessDelectedMany,
+  //   isError: isErrorDeletedMany,
+  // } = mutationDeletedMany;
 
-  const queryUser = useQuery({ queryKey: ["users"], queryFn: getAllUser });
-  const { isPending: isPendingUser, data: users } = queryUser;
+  const queryUser = useQuery({ queryKey: ["users"], queryFn: getAllUsers });
+  const { isPending: isPendingUsers, data: users } = queryUser;
+  const renderAction = () => {
+    return (
+      <div style={{ display: "flex", gap: "16px" }}>
+        <EditOutlined
+          style={{ color: "orange", fontSize: "20px", cursor: "pointer" }}
+          onClick={handleDetailsProduct}
+        />
+        <DeleteOutlined
+          style={{ color: "red", fontSize: "20px", cursor: "pointer" }}
+          onClick={() => setIsModalOpenDelete(true)}
+        />
+      </div>
+    );
+  };
 
   const handleSearch = (selectedKeys, confirm, dataIndex) => {
     confirm();
+    // setSearchText(selectedKeys[0]);
+    // setSearchedColumn(dataIndex);
   };
   const handleReset = (clearFilters) => {
     clearFilters();
@@ -253,11 +268,11 @@ const AdminUser = () => {
       sorter: (a, b) => a.phone - b.phone,
       ...getColumnSearchProps("phone"),
     },
-    // {
-    //   title: "Action",
-    //   dataIndex: "action",
-    //   render: renderAction,
-    // },
+    {
+      title: "Action",
+      dataIndex: "action",
+      render: renderAction,
+    },
   ];
   const dataTable =
     users?.data?.length &&
@@ -265,22 +280,49 @@ const AdminUser = () => {
       return {
         ...user,
         key: user._id,
-        isAdmin: user.isAdmin ? "True" : "False",
-        name: user.name ? user.name : "Null",
-        email: user.email ? user.email : "Null",
-        phone: user.phone ? user.phone : "Null",
-        address: user.address ? user.address : "Null",
+        name: user.name ? user.name : "chưa xác thực",
+        phone: user.phone ? user.phone : "chưa xác thực",
+        address: user.address ? user.address : "chưa xác thực",
+        isAdmin: user.isAdmin ? "TRUE" : "FALSE",
       };
     });
 
   useEffect(() => {
-    if (isSuccessDeleted && dataDeleted?.status === "OK") {
-      message.success("Xóa user thành công", messageApi);
+    if (isSuccessDelected && dataDeleted?.status === "OK") {
+      message.success("Xóa người dùng thành công!", messageApi);
       handleCancelDelete();
     } else if (isErrorDeleted) {
-      message.error("Có lỗi xảy ra", messageApi);
+      message.error("Có lỗi xảy ra!", messageApi);
     }
-  }, [isSuccessDeleted]);
+  }, [isSuccessDelected]);
+
+  // useEffect(() => {
+  //   if (isSuccessDelectedMany && dataDeletedMany?.status === "OK") {
+  //     message.success();
+  //   } else if (isErrorDeletedMany) {
+  //     message.error();
+  //   }
+  // }, [isSuccessDelectedMany]);
+
+  const handleCloseDrawer = () => {
+    setIsOpenDrawer(false);
+    setStateUserDetails({
+      name: "",
+      email: "",
+      phone: "",
+      isAdmin: false,
+    });
+    form.resetFields();
+  };
+
+  useEffect(() => {
+    if (isSuccessUpdated && dataUpdated?.status === "OK") {
+      message.success("Cập nhật người dùng thành công!", messageApi);
+      handleCloseDrawer();
+    } else if (isErrorUpdated) {
+      message.error("Có lỗi xảy ra!", messageApi);
+    }
+  }, [isSuccessUpdated]);
 
   const handleCancelDelete = () => {
     setIsModalOpenDelete(false);
@@ -297,39 +339,11 @@ const AdminUser = () => {
     );
   };
 
-  const handleCloseDrawer = () => {
-    setIsOpenDrawer(false);
-    setStateUserDetails({
-      name: "",
-      email: "",
-      phone: "",
-      isAdmin: false,
-    });
-    form.resetFields();
-  };
-
-  const onFinishFailed = (errorInfo) => {
-    console.log("Failed:", errorInfo);
-  };
-
-  const handleOnChangeDetails = (e) => {
+  const handleOnchangeDetails = (e) => {
     setStateUserDetails({
       ...stateUserDetails,
       [e.target.name]: e.target.value,
     });
-  };
-
-  // check
-
-  const onUpdateUser = () => {
-    mutationUpdate.mutate(
-      { id: rowSelected, token: user?.access_token, ...stateUserDetails },
-      {
-        onSettled: () => {
-          queryUser.refetch();
-        },
-      }
-    );
   };
 
   const handleOnchangeAvatarDetails = async ({ fileList }) => {
@@ -342,77 +356,59 @@ const AdminUser = () => {
       avatar: file.preview,
     });
   };
+  const onUpdateUser = () => {
+    mutationUpdate.mutate(
+      { id: rowSelected, token: user?.access_token, ...stateUserDetails },
+      {
+        onSettled: () => {
+          queryUser.refetch();
+        },
+      }
+    );
+  };
 
-  useEffect(() => {
-    if (isSuccessUpdated && dataUpdated?.status === "OK") {
-      message.success("Cập nhật user thành công", messageApi);
-      handleCloseDrawer();
-    } else if (isErrorUpdated) {
-      message.error("Có lỗi xảy ra", messageApi);
-    }
-  }, [isSuccessUpdated]);
-
-  useEffect(() => {
-    if (user?.access_token) {
-      queryUser.refetch(); // Lấy lại dữ liệu người dùng khi access_token có giá trị
-    }
-  }, [user?.access_token]);
   return (
-    <>
-      {contextHolder}
+    <>{contextHolder}
       <div>
         <WrapperHeader>Quản lý người dùng</WrapperHeader>
-        <TableCompoment
-          columns={columns}
-          isPending={isPendingUser}
-          data={dataTable}
-          onRow={(record, rowIndex) => {
-            return {
-              onClick: (event) => {
-                setRowSelected(record._id);
-              },
-            };
-          }}
-        />
-
+        <div style={{ marginTop: "20px" }}>
+          <TableCompoment
+            // handleDelteMany={handleDelteManyUsers}
+            columns={columns}
+            isPending={isPendingUsers}
+            data={dataTable}
+            onRow={(record, rowIndex) => {
+              return {
+                onClick: (event) => {
+                  setRowSelected(record._id);
+                },
+              };
+            }}
+          />
+        </div>
         <DrawerComponent
           title="Chi tiết người dùng"
           isOpen={isOpenDrawer}
-          width="45%"
-          onClose={() => {
-            setIsOpenDrawer(false);
-          }}
+          onClose={() => setIsOpenDrawer(false)}
+          width="60%"
         >
           <Loading isPending={isPendingUpdate || isPendingUpdated}>
             <Form
               name="basic"
-              labelCol={{
-                span: 6,
-              }}
-              wrapperCol={{
-                span: 18,
-              }}
-              style={{
-                maxWidth: 600,
-              }}
+              labelCol={{ span: 2 }}
+              wrapperCol={{ span: 22 }}
               onFinish={onUpdateUser}
-              onFinishFailed={onFinishFailed}
-              autoComplete="off"
+              autoComplete="on"
               form={form}
             >
               <Form.Item
                 label="Name"
                 name="name"
-                rules={[
-                  {
-                    required: true,
-                    message: "Please input your name!",
-                  },
-                ]}
+                rules={[{ required: true, message: "Please input your name!" }]}
               >
                 <InputComponentProduct
-                  value={stateUserDetails.name}
-                  onChange={handleOnChangeDetails}
+                  value={stateUserDetails["name"]}
+                  onChange={handleOnchangeDetails}
                   name="name"
                 />
               </Form.Item>
@@ -420,86 +416,64 @@ const AdminUser = () => {
               <Form.Item
                 label="Email"
                 name="email"
-                rules={[
-                  {
-                    required: true,
-                    message: "Please input your email!",
-                  },
-                ]}
+                rules={[{ required: true, message: "Please input your email!" }]}
               >
                 <InputComponentProduct
-                  value={stateUserDetails.type}
-                  onChange={handleOnChangeDetails}
+                  value={stateUserDetails["email"]}
+                  onChange={handleOnchangeDetails}
                   name="email"
                 />
               </Form.Item>
-
               <Form.Item
                 label="Phone"
                 name="phone"
-                rules={[
-                  {
-                    required: true,
-                    message: "Please input your phone!",
-                  },
-                ]}
+                rules={[{ required: true, message: "Please input your  phone!" }]}
               >
                 <InputComponentProduct
                   value={stateUserDetails.phone}
-                  onChange={handleOnChangeDetails}
+                  onChange={handleOnchangeDetails}
                   name="phone"
                 />
               </Form.Item>
 
               <Form.Item
-                label="Address"
+                label="Adress"
                 name="address"
                 rules={[
-                  {
-                    required: true,
-                    message: "Please input your address!",
-                  },
+                  { required: true, message: "Please input your  address!" },
                 ]}
               >
                 <InputComponentProduct
                   value={stateUserDetails.address}
-                  onChange={handleOnChangeDetails}
+                  onChange={handleOnchangeDetails}
                   name="address"
                 />
               </Form.Item>
 
-              {/* check */}
               <Form.Item
                 label="Avatar"
                 name="avatar"
-                rules={[
-                  {
-                    required: true,
-                    message: "Please select your avatar!",
-                  },
-                ]}
+                rules={[{ required: true, message: "Please input your image!" }]}
               >
-                <div>
-                  <WrapperUploadFile
-                    onChange={handleOnchangeAvatarDetails}
-                    maxCount={1}
-                  >
-                    <Button>Select File</Button>
-                  </WrapperUploadFile>
-                  {stateUserDetails?.avatar && (
-                    <img
-                      src={stateUserDetails.avatar}
-                      style={{
-                        height: "120px",
-                        width: "120px",
-                        objectFit: "cover",
-                      }}
-                      alt="avatar"
-                    />
-                  )}
-                </div>
+                <WrapperUploadFile
+                  onChange={handleOnchangeAvatarDetails}
+                  maxCount={1}
+                >
+                  <Button>Select File</Button>
+                </WrapperUploadFile>
+                {stateUserDetails?.avatar && (
+                  <img
+                    src={stateUserDetails.avatar}
+                    style={{
+                      height: "120px",
+                      width: "120px",
+                      objectFit: "cover",
+                    }}
+                    alt="avatar"
+                  />
+                )}
               </Form.Item>
-              <Form.Item wrapperCol={{ offset: 18, span: 16 }}>
+              <Form.Item wrapperCol={{ offset: 20, span: 16 }}>
                 <Button type="primary" htmlType="submit">
                   Apply
                 </Button>
@@ -508,19 +482,18 @@ const AdminUser = () => {
           </Loading>
         </DrawerComponent>
         <ModalCompoment
-          forceRender
-          title="Xóa sản phẩm"
+          title="Xóa người dùng"
           open={isModalOpenDelete}
           onCancel={handleCancelDelete}
           onOk={handleDeleteUser}
         >
           <Loading isPending={isPendingDeleted}>
-            <div>Bạn có chắc xóa sản phẩm này không?</div>
+            <div>Bạn có chắc xóa tài khoản này không?</div>
           </Loading>
         </ModalCompoment>
       </div>
     </>
   );
-};
 
+};
 export default AdminUser;

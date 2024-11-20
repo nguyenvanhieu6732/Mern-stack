@@ -19,6 +19,7 @@ import { PlusOutlined, MinusOutlined } from "@ant-design/icons";
 import { useDispatch, useSelector } from "react-redux";
 import { Navigate, useLocation, useNavigate } from "react-router-dom";
 import { addOrderProduct } from "../../redux/slices/orderSlice";
+import { convertPrice } from "../../utils";
 const ProductDetailsCompoment = ({ idProduct }) => {
   const [numProduct, setNumProduct] = useState(1);
   const user = useSelector((state) => state.user);
@@ -140,7 +141,7 @@ const ProductDetailsCompoment = ({ idProduct }) => {
             Đã bán 1000
           </span>
         </div>
-        <WrapperPriceProduct>{productDetails?.price}</WrapperPriceProduct>
+        <WrapperPriceProduct>{convertPrice(productDetails?.price)}</WrapperPriceProduct>
         <WrapperAddressProduct>
           <span>Giao đến </span>
           <span className="address">{user?.address}</span> -
