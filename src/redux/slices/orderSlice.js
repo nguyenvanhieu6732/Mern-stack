@@ -6,7 +6,7 @@ const initialState = {
   shippingAddress: {},
   paymentMethod: "",
   itemsPrice: 0,
-  shippingPrice: 0,
+  ShippingPrice: 0,
   taxPrice: 0,
   totalPrice: 0,
   user: "",

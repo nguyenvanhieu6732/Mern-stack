@@ -22,7 +22,7 @@ const HomePage = () => {
   const searchDebounce = useDebounce(searchProduct, 1000);
   const [stateProduct, setStateProduct] = useState([]);
   const [limit, setLimit] = useState(6);
-  const arr = ["TV", "Tủ Lạnh", "Máy Giặt", "Điều Hòa", "Đầu Đĩa"];
+  const arr = ["Xe Địa Hình", "Xe Thể Thao", "Xe Trẻ Em", "Xe cho người cao tuổi", "Xe đạp điện"];
 
   const fetchProductAll = async (context) => {
     const limit = context?.queryKey && context?.queryKey[1];
@@ -77,6 +77,7 @@ const HomePage = () => {
                   countInStock={productItem.countInStock}
                   description={productItem.description}
                   image={productItem.image}
+                  discount={productItem.discount}
                   name={productItem.name}
                   price={productItem.price}
                   rating={productItem.rating}

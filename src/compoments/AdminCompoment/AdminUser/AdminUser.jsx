@@ -74,7 +74,8 @@ const AdminUser = () => {
   };
 
   const fetchGetDetailsUser = async (rowSelected) => {
-    const res = await userService.getDetailsUser(rowSelected);
+    const accessToken = user?.access_token;
+    const res = await userService.getDetailsUser(rowSelected, accessToken);
     if (res?.data) {
       setStateUserDetails({
         name: res?.data?.name,

@@ -142,9 +142,7 @@ const SignInPage = () => {
                 Đăng nhập
               </Button>
             </Loading>
-            <p>
               <WrapperTextLink>Quên mật khẩu?</WrapperTextLink>
-            </p>
             <p>
               Chưa có tài khoản?
               <WrapperTextLink
@@ -167,7 +165,6 @@ const SignInPage = () => {
           </WrapperContentRight>
         </div>
       </div>
-      <FooterCompoment />
     </>
   );
 };

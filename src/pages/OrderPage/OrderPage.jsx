@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { WrapperCountOrder, WrapperInfo, WrapperInputNumber, WrapperItemOrder, WrapperLeft, WrapperListOrder, WrapperRight, WrapperStyleHeader, WrapperTotal } from "./style";
+import { WrapperCountOrder, WrapperInfo, WrapperInputNumber, WrapperItemOrder, WrapperLeft, WrapperListOrder, WrapperRight, WrapperStyleHeader, WrapperStyleHeaderDelivery, WrapperTotal } from "./style";
 import { Checkbox, Form } from "antd";
 import { DeleteOutlined, MinusOutlined, PlusOutlined } from "@ant-design/icons";
 import ButtonComponent from "../../compoments/ButtonComponent/ButtonComponent";
@@ -13,6 +13,7 @@ import { decreaseAmount, increaseAmount, removeAllOrderProduct, removeOrderProdu
 import { useNavigate } from "react-router-dom";
 import * as userService from "../../services/userService";
 import { useMutationHooks } from "../../hook/useMutationHook";
+import StepComponent from "../../compoments/StepComponent/StepComponent";
 
 
 
@@ -59,7 +60,9 @@ const OrderPage = () => {
   const handleDeleteOrder = (idProduct) => {
     dispatch(removeOrderProduct({ idProduct }))
   }
-  const handleChangeAddress = () => { }
+  const handleChangeAddress = () => {
+    setIsOpenModalUpdateInfo(true);
+  }
   const mutationUpdate = useMutationHooks((data) => {
     const { id, token, ...rests } = data;
     const res = userService.updateUser(id, { ...rests }, token);
@@ -84,8 +87,13 @@ const OrderPage = () => {
         {
           onSuccess: () => {
             dispatch(userService({ name, address, city, phone }));
-            setIsOpenModalUpdateInfo(false);
           },
+          onSettled: () => {
+            setIsOpenModalUpdateInfo(false);
+            // navigate("/payment");
+            window.location.reload();
+          }
+
         }
       );
     }
@@ -131,7 +139,7 @@ const OrderPage = () => {
   const priceMemo = useMemo(() => {
     const result = order?.orderItemsSelected?.reduce((total, cur) => {
       return total + ((cur.price * cur.amount));
-    }, 0) || 0;
+    }, 0);
     return result;
   }, [order]);
 
@@ -147,9 +155,9 @@ const OrderPage = () => {
   }, [order]);
 
   const diliveryPriceMemo = useMemo(() => {
-    if (priceMemo >= 2000000 && priceMemo < 50000000) {
+    if (priceMemo >= 2000000 && priceMemo < 5000000) {
       return 10000;
-    } else if (priceMemo >= 50000000) {
+    } else if (priceMemo >= 5000000) {
       return 0;
     } else if (order?.orderItemsSelected?.length === 0) {
       return 0;
@@ -164,6 +172,22 @@ const OrderPage = () => {
     );
   }, [priceMemo, priceDiscountMemo, diliveryPriceMemo]);
 
+  const itemsDelivery = [
+    {
+      title: "20.000 đ",
+      description: "Dưới 2.000.000 đ",
+    },
+    {
+      title: "10.000 đ",
+      description: "Từ 2.000.000 đến 5.000.000 đ",
+      subTitle: "Left 00:00:08",
+    },
+    {
+      title: "0 đ",
+      description: "Trên 5.000.000 đ",
+    },
+  ];
+
   return (
     <>
       {contextHolder}
@@ -172,6 +196,20 @@ const OrderPage = () => {
           <h3>Giỏ hàng</h3>
           <div style={{ display: "flex", justifyContent: "center" }}>
             <WrapperLeft>
+              <WrapperStyleHeaderDelivery>
+                <StepComponent
+                  items={itemsDelivery}
+                  current={
+                    diliveryPriceMemo === 10000
+                      ? 2
+                      : diliveryPriceMemo === 20000
+                        ? 1
+                        : order.orderItemsSelected.length === 0
+                          ? 0
+                          : 3
+                  }
+                />
+              </WrapperStyleHeaderDelivery>
               <WrapperStyleHeader>
                 <span style={{ display: "inline-block", width: "390px" }}>
                   <Checkbox
@@ -317,7 +355,7 @@ const OrderPage = () => {
                     <span style={{ color: "blue" }}>Địa chỉ giao hàng: </span>
                     <span
                       style={{ fontWeight: "bold" }}
-                    >Vu Thu - Thai Binh</span>
+                    >{`${user?.address} - ${user.city}`}</span>
                   </div>
                   <span
                     style={{ color: "blue", cursor: "pointer" }}

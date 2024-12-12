@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Badge, Col, Input, Popover } from "antd";
+import { Alert, Badge, Col, Input, Popover } from "antd";
 import {
   WrapperHeader,
   WrapperTextHeader,
@@ -35,6 +35,24 @@ const HeaderCompomment = ({ isHiddenSearch = false, isHiddenCart = false }) => {
   const [useName, setUserName] = useState("");
   const [useAvatar, setUserAvatar] = useState("");
   const [search, setSearch] = useState("");
+  const [isOpenPopup, setIsOpenPopup] = useState(false);
+  const handleClickNavigate = (type) => {
+    if (type === "profile") {
+      Navigate("/profile-user");
+    } else if (type === "admin") {
+      Navigate("/system/admin");
+    } else if (type === "my-order") {
+      Navigate("/my-order", {
+        state: {
+          id: user?.id,
+          token: user?.access_token,
+        },
+      });
+    } else {
+      handleLogout();
+    }
+    setIsOpenPopup(false);
+  };
   const handleLogout = async () => {
     setPending(true);
     await userService.logOutUser();
@@ -44,7 +62,6 @@ const HeaderCompomment = ({ isHiddenSearch = false, isHiddenCart = false }) => {
     Navigate("/");
     setPending(false);
   };
-
   useEffect(() => {
     setPending(true);
     setUserName(user?.name);
@@ -53,15 +70,16 @@ const HeaderCompomment = ({ isHiddenSearch = false, isHiddenCart = false }) => {
   }, [user?.name, user?.avatar]);
   const content = (
     <div>
-      <WrapperHeaderPopup onClick={() => Navigate("/profile-user")}>
+      <WrapperHeaderPopup onClick={() => handleClickNavigate("profile-user")}>
         Thông tin người dùng
       </WrapperHeaderPopup>
       {user?.isAdmin && (
-        <WrapperHeaderPopup onClick={() => Navigate("/system/admin")}>
+        <WrapperHeaderPopup onClick={() => handleClickNavigate("admin")}>
           Quản lý hệ thống
         </WrapperHeaderPopup>
       )}
-      <WrapperHeaderPopup onClick={handleLogout}>Đăng xuất</WrapperHeaderPopup>
+      <WrapperHeaderPopup onClick={() => handleClickNavigate(`my-order`)}>Đơn hàng của tôi</WrapperHeaderPopup>
+      <WrapperHeaderPopup onClick={() => handleClickNavigate()}>Đăng xuất</WrapperHeaderPopup>
     </div>
   );
 
@@ -116,8 +134,8 @@ const HeaderCompomment = ({ isHiddenSearch = false, isHiddenCart = false }) => {
               )}
               {user?.access_token ? (
                 <>
-                  <Popover content={content} trigger="click">
-                    <div style={{ cursor: "pointer" }}>
+                  <Popover content={content} trigger="click" open={isOpenPopup}>
+                    <div style={{ cursor: "pointer" }} onClick={() => setIsOpenPopup((prev) => !prev)}>
                       {useName?.length ? useName : user?.email}
                     </div>
                   </Popover>
@@ -137,7 +155,7 @@ const HeaderCompomment = ({ isHiddenSearch = false, isHiddenCart = false }) => {
                 </div>
               )}
               {!isHiddenCart && (
-                <div style={{ marginLeft: "46px", cursor:"pointer" }} onClick={() => Navigate("/order")}>
+                <div style={{ marginLeft: "46px", cursor: "pointer" }} onClick={() => Navigate("/order")}>
                   <Badge count={order?.orderItems?.length} small>
                     <ShoppingCartOutlined style={{ fontSize: "32px", color: "white" }} />
                   </Badge>
