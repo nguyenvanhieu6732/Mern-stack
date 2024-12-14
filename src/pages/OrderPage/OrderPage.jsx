@@ -37,7 +37,7 @@ const OrderPage = () => {
     }
   }
   const handleRemoveAllOrder = () => {
-    if (listChecked.length > 1) {
+    if (listChecked.length >= 1) {
       dispatch(removeAllOrderProduct({ listChecked }))
     }
   }

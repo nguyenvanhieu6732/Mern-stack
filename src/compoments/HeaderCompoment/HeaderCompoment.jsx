@@ -37,7 +37,7 @@ const HeaderCompomment = ({ isHiddenSearch = false, isHiddenCart = false }) => {
   const [search, setSearch] = useState("");
   const [isOpenPopup, setIsOpenPopup] = useState(false);
   const handleClickNavigate = (type) => {
-    if (type === "profile") {
+    if (type === "profile-user") {
       Navigate("/profile-user");
     } else if (type === "admin") {
       Navigate("/system/admin");

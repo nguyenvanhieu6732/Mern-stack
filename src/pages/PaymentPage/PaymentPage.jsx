@@ -11,11 +11,11 @@ import { WrapperInfo, WrapperLeft } from '../OrderPage/style';
 import { Label, WrapperRadio, WrapperRight, WrapperTotal } from './style';
 import { convertPrice } from '../../utils';
 import * as message from "../../compoments/Message/Message";
-// import { PayPalButton } from "react-paypal-button-v2";
-import { PayPalScriptProvider, PayPalButtons } from '@paypal/react-paypal-js';
 import ButtonComponent from '../../compoments/ButtonComponent/ButtonComponent';
 import InputComponentProduct from '../../compoments/InputCompoment/InputComponentProduct';
 import { removeAllOrderProduct } from '../../redux/slices/orderSlice';
+import axios from "axios"
+
 
 
 
@@ -24,7 +24,6 @@ const PaymentPage = () => {
   const { messageApi, contextHolder } = message.useCustomMessage();
   const user = useSelector((state) => state.user);
   const navigate = useNavigate();
-  const [sdkReady, setSdkReady] = useState(false);
 
   const [delivery, setDelivery] = useState("fast");
   const [payment, setPayment] = useState("later_money");
@@ -134,7 +133,24 @@ const PaymentPage = () => {
   const handlePayment = (e) => {
     setPayment(e.target.value);
   }
-  const onSuccessVnPay = () => { }
+  const handleNavigateVnPayPage = async () => {
+    try {
+      const response = await axios.post(`${process.env.REACT_APP_API_KEY}/checkout/create_payment_url`, {
+        amount: totalPriceMemo,
+        bankCode: '',
+        orderDescription: "Đơn hàng của bạn",
+        orderType: payment,
+        language: "vn",
+      });
+      if (response.data) {
+        // Chuyển hướng đến URL thanh toán
+        window.location.href = response.data.paymentUrl; // Giả sử bạn nhận được URL thanh toán từ backend
+      }
+    } catch (error) {
+      console.log("Error:", error);
+    }
+  }
+  
   const handleAddOrder = () => {
     if (
       user?.access_token &&
@@ -308,17 +324,24 @@ const PaymentPage = () => {
                     </span>
                   </WrapperTotal>
                 </div>
-                {payment === "VnPay" && sdkReady ? (
-                  <div style={{ width: "220px" }}>
-                    <PayPalButtons
-                      amount={Math.round(totalPriceMemo / 30000)}
-                      // shippingPreference="NO_SHIPPING" // default is "GET_FROM_FILE"
-                      onSuccess={onSuccessVnPay}
-                      onError={() => {
-                        alert("Error");
-                      }}
-                    />
-                  </div>
+                {payment === "VnPay" ? (
+                  <ButtonComponent
+                    onClick={() => handleNavigateVnPayPage()}
+                    size={40}
+                    styleButton={{
+                      background: "rgb(255, 57, 69)",
+                      height: "48px",
+                      width: "220px",
+                      border: "none",
+                      borderRadius: "4px",
+                    }}
+                    textbutton={"Thanh Toán bằng VnPay"}
+                    styletextbutton={{
+                      color: "#fff",
+                      fontSize: "15px",
+                      fontWeight: "700",
+                    }}
+                  ></ButtonComponent>
                 ) : (
                   <ButtonComponent
                     onClick={() => handleAddOrder()}

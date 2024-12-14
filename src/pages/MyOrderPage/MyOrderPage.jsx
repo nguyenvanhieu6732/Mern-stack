@@ -10,7 +10,6 @@ import { convertPrice } from "../../utils";
 const MyOrderPage = () => {
     const location = useLocation();
     const { state } = location;
-    const navigate = useNavigate();
 
     const fetchMyOrder = async () => {
         const res = await orderService.getOrderByUserId(state?.id, state?.token);
