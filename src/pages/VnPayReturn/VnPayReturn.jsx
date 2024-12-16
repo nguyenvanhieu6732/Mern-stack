@@ -1,53 +1,65 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { useSelector } from 'react-redux';
 
 const VnPayReturn = () => {
     const location = useLocation();
     const navigate = useNavigate();
+    const order = useSelector((state) => state?.order);
 
+    const priceMemo = useMemo(() => {
+        const result = order?.orderItemsSelected?.reduce((total, cur) => {
+            return total + cur.price * cur.amount;
+        }, 0);
+        return result;
+    }, [order]);
+
+    const priceDiscountMemo = useMemo(() => {
+        const result = order?.orderItemsSelected?.reduce((total, cur) => {
+            const totalDiscount = cur.discount ? cur.discount : 0;
+            return total + (priceMemo * (totalDiscount * cur.amount)) / 100;
+        }, 0);
+        if (Number(result)) {
+            return result;
+        }
+        return 0;
+    }, [order]);
+
+    const diliveryPriceMemo = useMemo(() => {
+        if (priceMemo > 200000) {
+            return 10000;
+        } else if (priceMemo === 0) {
+            return 0;
+        } else {
+            return 20000;
+        }
+    }, [priceMemo]);
+    const totalPriceMemo = useMemo(() => {
+        return (
+            Number(priceMemo) - Number(priceDiscountMemo) + Number(diliveryPriceMemo)
+        );
+    }, [priceMemo, priceDiscountMemo, diliveryPriceMemo]);
     useEffect(() => {
         const fetchPaymentResult = async () => {
-            // Lấy các tham số từ URL
-            const params = new URLSearchParams(location.search);
-            const vnpSecureHash = params.get('vnp_SecureHash');
-            const vnpTxnRef = params.get('vnp_TxnRef');
-            const vnpAmount = params.get('vnp_Amount');
-            const vnpCommand = params.get('vnp_Command');
-            const vnpCreateDate = params.get('vnp_CreateDate');
-            const vnpCurrCode = params.get('vnp_CurrCode');
-            const vnpIpAddr = params.get('vnp_IpAddr');
-            const vnpLocale = params.get('vnp_Locale');
-            const vnpOrderInfo = params.get('vnp_OrderInfo');
-            const vnpOrderType = params.get('vnp_OrderType');
-            const vnpReturnUrl = params.get('vnp_ReturnUrl');
-            const vnpTmnCode = params.get('vnp_TmnCode');
-            const vnpVersion = params.get('vnp_Version');
-
             try {
+                // Lấy query parameters từ URL
+                const params = location.search;
+
                 // Gửi yêu cầu đến backend để xác thực chữ ký
-                const response = await axios.get('http://localhost:3000/api/checkout/vnpay_return', {
-                    params: {
-                        vnp_SecureHash: vnpSecureHash,
-                        vnp_TxnRef: vnpTxnRef,
-                        vnp_Amount: vnpAmount,
-                        vnp_Command: vnpCommand,
-                        vnp_CreateDate: vnpCreateDate,
-                        vnp_CurrCode: vnpCurrCode,
-                        vnp_IpAddr: vnpIpAddr,
-                        vnp_Locale: vnpLocale,
-                        vnp_OrderInfo: vnpOrderInfo,
-                        vnp_OrderType: vnpOrderType,
-                        vnp_ReturnUrl: vnpReturnUrl,
-                        vnp_TmnCode: vnpTmnCode,
-                        vnp_Version: vnpVersion
-                    }
-                });
+                const response = await axios.get(`${process.env.REACT_APP_API_KEY}/checkout/vnpay_return${params}`);
+                console.log(response);
 
                 // Kiểm tra kết quả trả về từ backend
                 if (response.data.success) {
                     // Chuyển hướng đến trang thành công
-                    navigate('/orderSuccess', { state: { responseCode: response.data.responseCode } });
+                    navigate('/orderSuccess', {
+                        state: {
+                            payment: "VnPay",
+                            orders: order?.orderItemsSelected,
+                            totalPriceMemo: totalPriceMemo
+                        }
+                    });
                 } else {
                     // Chuyển hướng đến trang thất bại
                     navigate('/orderFailure', { state: { responseCode: response.data.responseCode } });

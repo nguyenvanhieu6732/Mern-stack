@@ -12,6 +12,7 @@ import PaymentPage from "../pages/PaymentPage/PaymentPage.jsx";
 import OrderSuccess from "../pages/OrderSuccess/OrderSuccess.jsx";
 import MyOrderPage from "../pages/MyOrderPage/MyOrderPage.jsx";
 import VnPayReturn from "../pages/VnPayReturn/VnPayReturn.jsx";
+import DetailsOrderPage from "../pages/DetailsOrderPage/DetailsOrderPage.jsx";
 
 
 export const routes = [
@@ -44,10 +45,15 @@ export const routes = [
         path: "/orderSuccess",
         page: OrderSuccess,
         isShowHeader: true,
-    }, 
+    },
     {
-        path: "/cart/vnpay_return",
+        path: "/checkout/vnpay_return",
         page: VnPayReturn,
+        isShowHeader: true,
+    },
+    {
+        path: "/details-order/:id",
+        page: DetailsOrderPage,
         isShowHeader: true,
     },
     {

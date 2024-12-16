@@ -150,7 +150,7 @@ const PaymentPage = () => {
       console.log("Error:", error);
     }
   }
-  
+
   const handleAddOrder = () => {
     if (
       user?.access_token &&
@@ -170,6 +170,7 @@ const PaymentPage = () => {
         phone: user?.phone,
         city: user?.city,
         paymentMethod: payment,
+        shippingMethod: delivery,
         itemsPrice: priceMemo,
         ShippingPrice: diliveryPriceMemo,
         totalPrice: totalPriceMemo,
