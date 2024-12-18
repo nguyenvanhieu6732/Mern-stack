@@ -20,6 +20,7 @@ const OrderSuccess = () => {
     const user = useSelector((state) => state.user);
     const location = useLocation();
     const { state } = location;
+    localStorage.removeItem('delivery');
     return (
         <>
             {contextHolder}
@@ -36,7 +37,7 @@ const OrderSuccess = () => {
                                             <span style={{ color: "#ea8500", fontWeight: "bold" }}>
                                                 {orderContant.dilivery[state?.delivery]}
                                             </span>
-                                            Giao hàng tiết kiệm
+                                           - Giao hàng tiết kiệm
                                         </WrapperValue>
                                     </div>
                                 </WrapperInfo>
@@ -120,7 +121,7 @@ const OrderSuccess = () => {
                                     }}
                                 >
                                     Tổng tiền: 
-                                    {convertPrice(state?.totalPriceMemo)}
+                                    {convertPrice(Math.ceil(state?.totalPriceMemo))}
                                 </WrapperRight>
                             </WrapperContainer>
                         </div>

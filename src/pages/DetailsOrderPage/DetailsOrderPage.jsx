@@ -84,7 +84,8 @@ const DetailsOrderPage = () => {
                                 <div className="payment-info">
                                     {orderContant.payment[data?.paymentMethod]}
                                 </div>
-                                <div className="status-payment">
+                                Trạng thái: 
+                                <div className="status-payment"> 
                                     {data?.isPaid ? "Đã thanh toán" : "Chưa thanh toán"}
                                 </div>
                             </WrapperContentInfo>
@@ -135,7 +136,7 @@ const DetailsOrderPage = () => {
                                     <WrapperItem>{order?.amount}</WrapperItem>
                                     <WrapperItem>
                                         {order?.discount
-                                            ? convertPrice((priceMemo * order?.discount) / 100)
+                                            ? convertPrice(Math.ceil((priceMemo * order?.discount) / 100))
                                             : "0 đ"}
                                     </WrapperItem>
                                 </WrapperProduct>
@@ -144,7 +145,7 @@ const DetailsOrderPage = () => {
                         <WrapperAllPrice>
                             <WrapperItemLabel>Tổng cộng</WrapperItemLabel>
                             <WrapperItem>
-                                <WrapperItem>{convertPrice(data?.totalPrice)}</WrapperItem>
+                                <WrapperItem>{convertPrice(Math.ceil(data?.totalPrice))}</WrapperItem>
                             </WrapperItem>
                         </WrapperAllPrice>
                     </WrapperStyleContent>

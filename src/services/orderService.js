@@ -40,3 +40,13 @@ export const cancelOrder = async (id, access_token, orderItems) => {
     );
     return res.data;
 };
+
+export const getAllOrderUser = async (access_token) => {
+    const res = await axiosJWT.get(`${process.env.REACT_APP_API_KEY}/order/get-all-order-user`, {
+        headers: {
+            token: `Bearer ${access_token}`,
+        },
+    }
+    );
+    return res.data;
+};

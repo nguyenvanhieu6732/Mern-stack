@@ -13,12 +13,14 @@ export const WrapperCardStyle = styled(Card)`
 `;
 
 export const StyleNameProduct = styled.div`
-    font-weight: 400;
-    font-size: 16px;
-    line-height: 16px;
-    color: rgb(56,56, 61);
-    overflow: hidden;
-    text-overflow: ellipsis;  
+
+    height: 2.4em; /* Chiều cao cho 2 dòng */
+  line-height: 1.2em; /* Chiều cao dòng */
+  overflow: hidden; /* Ẩn phần văn bản vượt quá chiều cao */
+  text-overflow: ellipsis; /* Hiển thị dấu "..." nếu văn bản quá dài */
+  display: -webkit-box; /* Sử dụng flexbox để giới hạn số dòng */
+  -webkit-line-clamp: 2; /* Giới hạn số dòng hiển thị */
+  -webkit-box-orient: vertical; 
 `
 
 export const WrapperReportText = styled.div`

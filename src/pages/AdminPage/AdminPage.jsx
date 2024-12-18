@@ -1,9 +1,10 @@
 import { Menu } from "antd";
 import React, { useState } from "react";
-import { UserOutlined, ProductOutlined } from "@ant-design/icons";
+import { UserOutlined, ProductOutlined, ShoppingCartOutlined } from "@ant-design/icons";
 import HeaderCompomment from "../../compoments/HeaderCompoment/HeaderCompoment";
 import AdminUser from "../../compoments/AdminCompoment/AdminUser/AdminUser";
 import AdminProduct from "../../compoments/AdminCompoment/AdminProduct/AdminProduct";
+import AdminOrder from "../../compoments/AdminCompoment/AdminOrder/AdminOrder";
 
 const AdminPage = () => {
   const items = [
@@ -17,6 +18,11 @@ const AdminPage = () => {
       icon: <UserOutlined />,
       label: "Người dùng",
     },
+    {
+      key: "order",
+      icon: <ShoppingCartOutlined />,
+      label: "Đơn hàng",
+    },
   ];
 
   const [keySelected, setKeySelected] = useState("product");
@@ -29,6 +35,8 @@ const AdminPage = () => {
         return <AdminProduct />;
       case "user":
         return <AdminUser />;
+        case "order":
+        return <AdminOrder/>;
       default:
         return <></>;
     }

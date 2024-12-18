@@ -62,7 +62,9 @@ const ProductDetailsCompoment = ({ idProduct }) => {
             amount: numProduct,
             image: productDetails?.image,
             price: productDetails?.price,
-            product: productDetails?._id
+            product: productDetails?._id,
+            discount: productDetails?.discount,
+            countInStock: productDetails?.countInStock,
           },
         })
       );
@@ -153,15 +155,16 @@ const ProductDetailsCompoment = ({ idProduct }) => {
             style={{
               border: "none",
               background: "transparent",
-              cursor: "pointer",
+              cursor: numProduct > 1 ? "pointer" : "not-allowed",
+              opacity: numProduct > 1 ? 1 : 0.5,
             }}
             onClick={() => handleChangeCount("decrease")}
+            disabled={numProduct <= 1}
           >
             <MinusOutlined style={{ color: "#000", fontSize: "14px", padding: "0 4px" }} />
           </button>
           <WrapperInputNumber
             onChange={onChange}
-            defaultValue={1}
             value={numProduct}
             size="small"
             min={1}
@@ -171,11 +174,13 @@ const ProductDetailsCompoment = ({ idProduct }) => {
             style={{
               border: "none",
               background: "transparent",
-              cursor: "pointer",
+              cursor: numProduct < productDetails?.countInStock ? "pointer" : "not-allowed",
+              opacity: numProduct < productDetails?.countInStock ? 1 : 0.5,
             }}
             onClick={() => handleChangeCount("increase")}
+            disabled={numProduct >= productDetails?.countInStock}
           >
-            <PlusOutlined style={{ color: "#000", fontSize: "14px" , padding: "0 4px"}} />
+            <PlusOutlined style={{ color: "#000", fontSize: "14px", padding: "0 4px" }} />
           </button>
         </WrapperQualityProduct>
         <Row>

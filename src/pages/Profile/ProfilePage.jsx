@@ -37,6 +37,7 @@ const ProfilePage = () => {
   const [phone, setPhone] = useState("");
   const [address, setAddress] = useState("");
   const [avatar, setAvatar] = useState("");
+  const [error, setError] = useState(""); // Trạng thái để theo dõi lỗi
 
   const mutation = useMutationHooks((data) => {
     const { id, access_token, ...rests } = data;
@@ -63,7 +64,14 @@ const ProfilePage = () => {
     }
     setAvatar(file.preview);
   };
+
   const handleUpdate = () => {
+    // Kiểm tra các ô input có trống hay không
+    if (!name || !email || !phone || !address) {
+      setError("Tất cả các trường đều phải được điền.");
+      return;
+    }
+    setError(""); // Reset lỗi nếu không có lỗi
     mutation.mutate({
       id: user?.id,
       email,
@@ -99,9 +107,10 @@ const ProfilePage = () => {
     <>
       {contextHolder}
       <div style={{ width: "1270px", margin: "0 auto" }}>
-        <WrapperHeaderProfile>Thông tin người dùng</WrapperHeaderProfile>
+        <WrapperHeaderProfile>Thông tin người dùng </WrapperHeaderProfile>
         <Loading isPending={isPending}>
           <WrapperContentProfile>
+            {error && <div style={{ color: 'red' }}>{error}</div>} {/* Hiển thị thông báo lỗi */}
             <div>
               <span>Name</span>
               <Input
@@ -138,13 +147,13 @@ const ProfilePage = () => {
                 onChange={handleAddress}
                 value={address}
                 size="large"
-                placeholder="address user"
+                placeholder="Address user"
                 prefix={<HomeOutlined />}
               />
             </div>
             <div>
               <span>Avatar</span>
-              <br></br>
+              <br />
               <Upload onChange={handleAvatar} maxCount={1}>
                 <Button icon={<UploadOutlined />}>Select File</Button>
               </Upload>

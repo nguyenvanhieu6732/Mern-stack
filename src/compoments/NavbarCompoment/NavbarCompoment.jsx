@@ -61,21 +61,10 @@ const NavbarCompoment = () => {
   };
   return (
     <div>
-      <WrapperLabelText>Label</WrapperLabelText>
+      <WrapperLabelText>Lọc</WrapperLabelText>
       <WrapperTextContent>
-        {renderContent("text", [
-          "TV",
-          "Tủ Lạnh",
-          "Máy Giặt",
-          "Điều Hòa",
-          "Đầu Đĩa",
-        ])}
-        {renderContent("checkbox", [
-          { value: "a", label: "A" },
-          { value: "b", label: "B" },
-        ])}
         {renderContent("star", [5, 4, 3])}
-        {renderContent("price", ["Dưới 500.000", "Trên 500.000"])}
+        {renderContent("price", ["Dưới 5.000.000", "Trên 5.000.000"])}
       </WrapperTextContent>
     </div>
   );

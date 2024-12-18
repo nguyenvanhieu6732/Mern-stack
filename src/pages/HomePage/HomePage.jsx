@@ -21,8 +21,8 @@ const HomePage = () => {
   const [pending, setPending] = useState(false);
   const searchDebounce = useDebounce(searchProduct, 1000);
   const [stateProduct, setStateProduct] = useState([]);
+  const [typeProducts, setTypeProducts] = useState([]);
   const [limit, setLimit] = useState(6);
-  const arr = ["Xe Địa Hình", "Xe Thể Thao", "Xe Trẻ Em", "Xe cho người cao tuổi", "Xe đạp điện"];
 
   const fetchProductAll = async (context) => {
     const limit = context?.queryKey && context?.queryKey[1];
@@ -31,6 +31,15 @@ const HomePage = () => {
     return res;
   };
 
+  const fetchAllTypeProduct = async () => {
+    const res = await productService.getAllTypeProduct();
+    if (res?.status === "OK") {
+      setTypeProducts(res?.data);
+    }
+  };
+  useEffect(() => {
+    fetchAllTypeProduct();
+  }, []);
   const {
     isPending,
     data: product,
@@ -47,8 +56,8 @@ const HomePage = () => {
     <>
       <div style={{ padding: "0 120px" }}>
         <WrapperTypeProduct>
-          {arr.map((item, index) => {
-            return <TypeProduct name={item} key={index} />;
+        {typeProducts.map((item) => {
+            return <TypeProduct name={item} key={item} />;
           })}
         </WrapperTypeProduct>
       </div>

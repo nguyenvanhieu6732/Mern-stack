@@ -20,13 +20,15 @@ import axios from "axios"
 
 
 const PaymentPage = () => {
-  const order = useSelector((state) => state.order);
   const { messageApi, contextHolder } = message.useCustomMessage();
+  const order = useSelector((state) => state.order);
   const user = useSelector((state) => state.user);
   const navigate = useNavigate();
 
   const [delivery, setDelivery] = useState("fast");
   const [payment, setPayment] = useState("later_money");
+  const [form] = Form.useForm();
+  const dispatch = useDispatch();
 
   const [isOpenModalUpdateInfo, setIsOpenModalUpdateInfo] = useState(false);
   const [stateUserDetails, setStateUserDetails] = useState({
@@ -35,9 +37,7 @@ const PaymentPage = () => {
     address: "",
     city: "",
   });
-  const [form] = Form.useForm();
 
-  const dispatch = useDispatch();
 
   useEffect(() => {
     form.setFieldsValue(stateUserDetails);
@@ -71,7 +71,7 @@ const PaymentPage = () => {
       return total + (priceMemo * (totalDiscount * cur.amount)) / 100;
     }, 0);
     if (Number(result)) {
-      return result;
+      return Math.ceil(result);
     }
     return 0;
   }, [order]);
@@ -87,7 +87,7 @@ const PaymentPage = () => {
   }, [priceMemo]);
 
   const totalPriceMemo = useMemo(() => {
-    return (
+    return Math.ceil(
       Number(priceMemo) - Number(priceDiscountMemo) + Number(diliveryPriceMemo)
     );
   }, [priceMemo, priceDiscountMemo, diliveryPriceMemo]);
@@ -103,11 +103,11 @@ const PaymentPage = () => {
     const res = OrderService.createOrder({ ...rests }, token);
     return res;
   });
+  const { data: dataAdd, isPending: isPendingAddOrder, isSuccess, isError } = mutationAddOrder;
 
   const { isLoading, data } = mutationUpdate;
-  const { data: dataAdd, isPending: isPendingAddOrder, isSuccess, isError } = mutationAddOrder;
   useEffect(() => {
-    if (isSuccess && dataAdd?.status === "OK") {
+    if (isSuccess && dataAdd?.status === "OK") {  
       const arrayOrder = [];
       order?.orderItemsSelected?.forEach((element) => {
         arrayOrder.push(element.product);
@@ -129,6 +129,7 @@ const PaymentPage = () => {
 
   const handleDilivery = (e) => {
     setDelivery(e.target.value);
+    localStorage.setItem('delivery', JSON.stringify(e.target.value));
   }
   const handlePayment = (e) => {
     setPayment(e.target.value);
@@ -285,7 +286,7 @@ const PaymentPage = () => {
                           fontWeight: "bold",
                         }}
                       >
-                        {convertPrice(priceDiscountMemo)}
+                        {convertPrice(Math.ceil(priceDiscountMemo))}
                       </span>
                     </div>
                     <div
@@ -317,7 +318,7 @@ const PaymentPage = () => {
                           fontWeight: "bold",
                         }}
                       >
-                        {convertPrice(totalPriceMemo)}
+                        {convertPrice(Math.ceil(totalPriceMemo))}
                       </span>
                       <span style={{ color: "#000", fontSize: "11px" }}>
                         (Đã bao gồm VAT nếu có)

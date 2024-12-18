@@ -146,10 +146,10 @@ const OrderPage = () => {
   const priceDiscountMemo = useMemo(() => {
     const result = order?.orderItemsSelected?.reduce((total, cur) => {
       const totalDiscount = cur.discount ? cur.discount : 0;
-      return total + (priceMemo * (totalDiscount * cur.amount)) / 100;
+      return total + ((cur.price * cur.amount) * (totalDiscount / 100));
     }, 0);
     if (Number(result)) {
-      return result;
+      return Math.ceil(result);
     }
     return 0;
   }, [order]);
@@ -289,15 +289,13 @@ const OrderPage = () => {
                             style={{
                               border: "none",
                               background: "transparent",
-                              cursor: "pointer",
+                              cursor: order?.amount > 1 ? "pointer" : "not-allowed",
+                              opacity: order?.amount > 1 ? 1 : 0.5,
                             }}
                             onClick={() =>
-                              handleChangeCount(
-                                "decrease",
-                                order?.product,
-                                order?.amount === 1
-                              )
+                              handleChangeCount("decrease", order?.product, order?.amount === 1)
                             }
+                            disabled={order?.amount <= 1}
                           >
                             <MinusOutlined
                               style={{ color: "#000", fontSize: "14px", padding: "0 4px" }}
@@ -309,20 +307,19 @@ const OrderPage = () => {
                             size="small"
                             min={1}
                             max={order?.countInStock}
+                            onChange={(value) => handleChangeCount("set", order?.product, value)}
                           />
                           <button
                             style={{
                               border: "none",
                               background: "transparent",
-                              cursor: "pointer",
+                              cursor: order?.amount < order?.countInStock ? "pointer" : "not-allowed",
+                              opacity: order?.amount < order?.countInStock ? 1 : 0.5,
                             }}
                             onClick={() =>
-                              handleChangeCount(
-                                "increase",
-                                order?.product,
-                                order?.amount === 1
-                              )
+                              handleChangeCount("increase", order?.product, order?.amount === order?.countInStock)
                             }
+                            disabled={order?.amount >= order?.countInStock}
                           >
                             <PlusOutlined
                               style={{ color: "#000", fontSize: "14px", padding: "0 4px" }}
@@ -430,7 +427,7 @@ const OrderPage = () => {
                         fontWeight: "bold",
                       }}
                     >
-                      {convertPrice(totalPriceMemo)}
+                      {convertPrice(Math.ceil(totalPriceMemo))}
                     </span>
                     <span style={{ color: "#000", fontSize: "11px" }}>
                       (Đã bao gồm VAT nếu có)

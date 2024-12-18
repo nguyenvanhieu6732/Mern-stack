@@ -128,7 +128,7 @@ const MyOrderPage = () => {
                                                 <span style={{ color: "rgb(255, 66, 78)" }}>
                                                     Thanh toán:
                                                 </span>
-                                                {`${order.isPaid ? "Đã thanh toán" : "Chưa thanh toán"}`}
+                                                {`${order?.isPaid ? "Đã thanh toán" : "Chưa thanh toán"}`}
                                             </div>
                                         </WrapperStatus>
                                         {renderProduct(order?.orderItems)}
@@ -144,7 +144,7 @@ const MyOrderPage = () => {
                                                         fontWeight: 700,
                                                     }}
                                                 >
-                                                    {convertPrice(order?.totalPrice)}
+                                                    {convertPrice(Math.ceil(order?.totalPrice))}
                                                 </span>
                                             </div>
                                             <div style={{ display: "flex", gap: "10px" }}>

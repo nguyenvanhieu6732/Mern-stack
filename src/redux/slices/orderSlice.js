@@ -100,10 +100,13 @@ export const orderSlide = createSlice({
       });
       state.orderItemsSelected = orderSelected;
     },
+    setPaymentStatus: (state, action) => {
+      const { isPaid, paidAt } = action.payload;
+      state.isPaid = isPaid;
+    }
   },
 });
 
-// Action creators are generated for each case reducer function
 export const {
   addOrderProduct,
   resetOrder,
@@ -112,6 +115,7 @@ export const {
   removeOrderProduct,
   removeAllOrderProduct,
   selectedOrder,
+  setPaymentStatus
 } = orderSlide.actions;
 
 export default orderSlide.reducer;

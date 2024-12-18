@@ -9,13 +9,29 @@ export const isJsonString = (data) => {
 
 export const convertPrice = (price) => {
     try {
-      const result = price?.toLocaleString().replaceAll(",", ".");
-      return `${result} đ`;
+        const result = price?.toLocaleString().replaceAll(",", ".");
+        return `${result} đ`;
     } catch (error) {
-      return null;
+        return null;
     }
-  };
-  
+};
+export const renderOptions = (arr) => {
+    let results = [];
+    if (arr) {
+        results = arr?.map((opt) => {
+            return {
+                value: opt,
+                label: opt,
+            };
+        });
+    }
+    results.push({
+        label: "Thêm type",
+        value: "add_type",
+    });
+    return results;
+};
+
 export const getBase64 = (file) =>
     new Promise((resolve, reject) => {
         const reader = new FileReader();
