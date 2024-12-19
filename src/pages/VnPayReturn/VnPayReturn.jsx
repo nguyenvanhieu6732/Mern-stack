@@ -67,11 +67,12 @@ const VnPayReturn = () => {
 
                 // Gửi yêu cầu đến backend để xác thực chữ ký
                 const response = await axios.get(`${process.env.REACT_APP_API_KEY}/checkout/vnpay_return${params}`);
-
+                console.log(response.data)
                 // Kiểm tra kết quả trả về từ backend
                 if (response.data.success) {
                     mutationAddOrder.mutate({
                         token: user?.access_token,
+                        orderCode: response.data.orderCode,
                         orderItems: order?.orderItemsSelected,
                         fullName: user?.name,
                         address: user?.address,

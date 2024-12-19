@@ -20,6 +20,7 @@ import axios from "axios"
 
 
 const PaymentPage = () => {
+  const moment = require('moment');
   const { messageApi, contextHolder } = message.useCustomMessage();
   const order = useSelector((state) => state.order);
   const user = useSelector((state) => state.user);
@@ -107,7 +108,7 @@ const PaymentPage = () => {
 
   const { isLoading, data } = mutationUpdate;
   useEffect(() => {
-    if (isSuccess && dataAdd?.status === "OK") {  
+    if (isSuccess && dataAdd?.status === "OK") {
       const arrayOrder = [];
       order?.orderItemsSelected?.forEach((element) => {
         arrayOrder.push(element.product);
@@ -153,6 +154,8 @@ const PaymentPage = () => {
   }
 
   const handleAddOrder = () => {
+    let date = new Date();
+    let orderId = "DH" + moment(date).format('YYYYMMDDHHmmss');
     if (
       user?.access_token &&
       order?.orderItemsSelected &&
@@ -165,6 +168,7 @@ const PaymentPage = () => {
     ) {
       mutationAddOrder.mutate({
         token: user?.access_token,
+        orderCode: orderId,
         orderItems: order?.orderItemsSelected,
         fullName: user?.name,
         address: user?.address,

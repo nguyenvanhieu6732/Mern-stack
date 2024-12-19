@@ -95,6 +95,12 @@ const MyOrderPage = () => {
                     <span
                         style={{ fontSize: "13px", color: "#242424", marginLeft: "auto" }}
                     >
+                        Số lượng: {item?.amount}
+                    </span>
+                    
+                    <span
+                        style={{ fontSize: "13px", color: "#242424", marginLeft: "auto" }}
+                    >
                         {convertPrice(item?.price)}
                     </span>
                 </WrapperHeaderItem>
@@ -108,8 +114,8 @@ const MyOrderPage = () => {
             <Loading isPending={isPending || isPendingCancel}>
                 <WrapperContainer>
                     <div style={{ height: "100%", width: "1270px", margin: "0 auto" }}>
-                        <h4>Đơn hàng của tôi</h4>
                         <WrapperListOrder>
+                            <div style={{ marginLeft: "80px" }}><h4>Đơn hàng của tôi</h4></div>
                             {data?.map((order) => {
                                 console.log("data", data)
                                 return (
